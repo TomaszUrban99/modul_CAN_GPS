@@ -1,0 +1,17 @@
+../Drivers/CMSIS/Include/core_cm4.h:1684:22:__NVIC_EnableIRQ	16	static,ignoring_inline_asm
+../Drivers/CMSIS/Include/core_cm4.h:1814:22:__NVIC_SetPriority	16	static
+../Core/Src/Peripherals/uart.c:14:10:compute_uart_div	16	static
+../Core/Src/Peripherals/uart.c:20:6:set_uart_baudrate	24	static
+../Core/Src/Peripherals/uart.c:33:6:uart2_rx_tx_init	8	static
+../Core/Src/Peripherals/uart.c:99:6:uart3_rx_tx_init	8	static
+../Core/Src/Peripherals/uart.c:158:6:dma1_init	8	static
+../Core/Src/Peripherals/uart.c:170:6:dma1_stream1_rx_config	16	static
+../Core/Src/Peripherals/uart.c:218:6:dma1_stream3_tx_config	16	static
+../Core/Src/Peripherals/uart.c:259:6:dma1_stream5_rx_config	16	static
+../Core/Src/Peripherals/uart.c:309:6:usart2_process_data	72	static
+../Core/Src/Peripherals/uart.c:345:6:usart2_dma_check_buffer	24	static
+../Core/Src/Peripherals/uart.c:368:6:DMA1_Stream1_IRQHandler	4	static
+../Core/Src/Peripherals/uart.c:377:6:DMA1_Stream3_IRQHandler	4	static
+../Core/Src/Peripherals/uart.c:387:6:DMA1_Stream6_IRQHandler	4	static
+../Core/Src/Peripherals/uart.c:391:6:uart2_callback	4	static
+../Core/Src/Peripherals/uart.c:396:6:USART3_IRQHandler	4	static

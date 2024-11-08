@@ -1,0 +1,2 @@
+../Core/Src/Tasks/tasks.c:20:6:GPSmodule	16	static
+../Core/Src/Tasks/tasks.c:28:6:PCconnector	16	static
