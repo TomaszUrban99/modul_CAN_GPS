@@ -27,6 +27,23 @@
 #define ODR_PB7					(1U << 7)
 #define ODR_PB14				(1U << 14)
 
+/* POrt D */
+#define MODE_PD0_1				(1U << 1)
+#define MODE_PD0_0				(1U << 0)
+
+#define MODE_PD1_1				(1U << 3)
+#define MODE_PD1_0				(1U << 2)
+
+#define AFRL1_3					(1U << 7)
+#define AFRL1_2					(1U << 6)
+#define AFRL1_1					(1U << 5)
+#define AFRL1_0					(1U << 4)
+
+#define AFRL0_3					(1U << 3)
+#define AFRL0_2					(1U << 2)
+#define AFRL0_1					(1U << 1)
+#define AFRL0_0					(1U << 0)
+
 void gpiob_init(void);
 
 

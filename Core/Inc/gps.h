@@ -22,10 +22,6 @@
 typedef struct gps {
 
 	char gps_buffer [GPS_BUFFER];
-	uint8_t _head;
-	uint8_t _tail;
-
-	uint8_t _received_char;
 
 	uint8_t _longitude_attitude;
 	float _longitude;
@@ -33,28 +29,14 @@ typedef struct gps {
 	uint8_t _latitude_attitude;
 	float _latitude;
 
-	uint8_t _hours;
-	uint8_t _minute;
-	uint8_t _seconds;
-
-	uint8_t _gpsEnd;
-
-	uint8_t _usart2_idle;
-
 } gps;
 
+/*!
+ *  parseMessage - parse $GPGGA messages
+ *
+ *  Parse NMEA GPGGA message and extract location coordinates.
+ */
 int parseMessage ( gps *gpsStruct, char *msg, size_t length);
-
-/*
-void store_char ( gps *_gpsStruct, char ch);
-
-int get_char ( gps *_gpsStruct );
-
-int get_line ( gps *_gpsStruct );
-
-void parse_GPGAA ( gps *_gpsStruct, char *_ptr );
-
-void parse_message ( gps *_gpsStruct );*/
 
 
 

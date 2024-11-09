@@ -5,14 +5,17 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../Core/Src/Peripherals/can.c \
 ../Core/Src/Peripherals/gpiob.c \
 ../Core/Src/Peripherals/uart.c 
 
 OBJS += \
+./Core/Src/Peripherals/can.o \
 ./Core/Src/Peripherals/gpiob.o \
 ./Core/Src/Peripherals/uart.o 
 
 C_DEPS += \
+./Core/Src/Peripherals/can.d \
 ./Core/Src/Peripherals/gpiob.d \
 ./Core/Src/Peripherals/uart.d 
 
@@ -24,7 +27,7 @@ Core/Src/Peripherals/%.o Core/Src/Peripherals/%.su Core/Src/Peripherals/%.cyclo:
 clean: clean-Core-2f-Src-2f-Peripherals
 
 clean-Core-2f-Src-2f-Peripherals:
-	-$(RM) ./Core/Src/Peripherals/gpiob.cyclo ./Core/Src/Peripherals/gpiob.d ./Core/Src/Peripherals/gpiob.o ./Core/Src/Peripherals/gpiob.su ./Core/Src/Peripherals/uart.cyclo ./Core/Src/Peripherals/uart.d ./Core/Src/Peripherals/uart.o ./Core/Src/Peripherals/uart.su
+	-$(RM) ./Core/Src/Peripherals/can.cyclo ./Core/Src/Peripherals/can.d ./Core/Src/Peripherals/can.o ./Core/Src/Peripherals/can.su ./Core/Src/Peripherals/gpiob.cyclo ./Core/Src/Peripherals/gpiob.d ./Core/Src/Peripherals/gpiob.o ./Core/Src/Peripherals/gpiob.su ./Core/Src/Peripherals/uart.cyclo ./Core/Src/Peripherals/uart.d ./Core/Src/Peripherals/uart.o ./Core/Src/Peripherals/uart.su
 
 .PHONY: clean-Core-2f-Src-2f-Peripherals
 

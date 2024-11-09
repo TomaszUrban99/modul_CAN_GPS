@@ -1,0 +1,2 @@
+../Core/Src/Peripherals/can.c:3:6:can_filter_init	1
+../Core/Src/Peripherals/can.c:8:6:can_init	3

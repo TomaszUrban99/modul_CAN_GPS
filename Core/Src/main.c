@@ -40,28 +40,25 @@ void blinkLed ( void *parameters ){
 int main(void)
 {
 
-  HAL_Init();
-
-  /*NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);*/
-  SystemClock_Config();
+	/* HAL_Init contains NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4) */
+	HAL_Init();
+	SystemClock_Config();
 
 
   gpiob_init(); /* Init user's LED's */
-  gpsReceiver = xQueueCreate(QUEUE_LENGTH,sizeof(uint8_t));
 
-
-
-
- /* if ( pdPASS != xTaskCreate(initTask, "Init", 6000, NULL,configMAX_PRIORITIES-1,&ptr)){
-	 GPIOB->ODR |= ODR_PB14;
-  }*/
+  /* Create QUEUE's */
+  if ( (gpsReceiver = xQueueCreate(QUEUE_LENGTH,sizeof(uint8_t))) == NULL ){
+	  GPIOB->ODR |= ODR_PB14;
+  }
 
   uart2_rx_tx_init();
   uart3_rx_tx_init();
   dma1_init();
   dma1_stream5_rx_config((uint32_t) usart2.uart_rx_dma_buffer);
 
-	if ( pdPASS != xTaskCreate(usart2_dma_rx_task,"DMAU2",2048,
+
+  if ( pdPASS != xTaskCreate(usart2_dma_rx_task,"DMAU2",2048,
 			NULL,configMAX_PRIORITIES-1,NULL)){
 		GPIOB->ODR |= ODR_PB7;
 		}
@@ -81,19 +78,15 @@ void USART2_IRQHandler(void){
 
 	if (USART2->SR & SR_IDLE){
 
+		uint8_t d = 1;
+
 		xHigherPriorityTaskWoken = pdFALSE;
 		USART2->DR;
 
-
-		uint8_t d = 1;
-		/* Read DR in order to clear interrupt flag */
-
-		if ( xQueueSendFromISR(gpsReceiver,&d,&xHigherPriorityTaskWoken) != pdTRUE ){
+		/* Check if message has been sent correctly */
+		if( xQueueSendFromISR(gpsReceiver,&d,&xHigherPriorityTaskWoken) != pdTRUE ){
 			GPIOB->ODR |= ODR_PB7;
-
 		}
-
-		GPIOB->ODR ^= ODR_PB7;
 
 		portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 	}
@@ -106,14 +99,12 @@ void DMA1_Stream5_IRQHandler(void){
 
 	if (((DMA1->HISR) & HIFSR_CTCIF5)){
 
-		GPIOB->ODR ^= ODR_PB0;
 		xQueueSendFromISR(gpsReceiver,&d,&xHigherPriorityTaskWoken);
 		DMA1->HIFCR |= HIFCR_CTCIF5;
 	}
 
 	if (((DMA1->HISR) & HIFSR_CHTIF5)){
 
-		GPIOB->ODR ^= ODR_PB0;
 		xQueueSendFromISR(gpsReceiver,&d,&xHigherPriorityTaskWoken);
 		DMA1->HIFCR |= HIFCR_CHTIF5;
 	}
@@ -166,39 +157,19 @@ void usart2_dma_rx_task ( void *queuePtr ){
 
 	while(1){
 
-		GPIOB->ODR |= ODR_PB0;
+		GPIOB->ODR ^= ODR_PB0;
+
+		/* Wait until there is any element from USART2 IRQ and
+		 * DMA1_Stream5 IRQ handlers
+		 */
 		xQueueReceive(gpsReceiver, &d, portMAX_DELAY);
-		GPIOB->ODR &= ODR_PB0;
+
+		/* Process message */
 		usart2_dma_check_buffer(&usart2, &gpsData);
 	}
 
 }
 
-void initTask ( void *parameters ){
-
-
-	gpiob_init();
-
-	if ( gpsReceiver == NULL ){
-		GPIOB->ODR |= ODR_PB14;
-	}
-
-	uint8_t t = 1;
-
-	/*xQueueSend(gpsReceiver,&t,portMAX_DELAY);*/
-
-	/*uart2_rx_tx_init();*/
-	uart3_rx_tx_init();
-	/*dma1_init();
-	dma1_stream5_rx_config((uint32_t) usart2.uart_rx_dma_buffer);*/
-
-	if ( pdPASS != xTaskCreate(usart2_dma_rx_task,"DMAU2",6000,
-			NULL,configMAX_PRIORITIES-1,NULL)){
-		GPIOB->ODR |= ODR_PB14;
-		}
-
-	vTaskDelete(ptr);
-}
 
 /**
   * @brief  This function is executed in case of error occurrence.

@@ -87,14 +87,4 @@ void DMA1_Stream1_IRQHandler(void);
 void DMA1_Stream3_IRQHandler(void);
 
 
-
-/* Store character in buffer */
-/*void store_char(ring_buffer *ptr, char ch);*/
-
-/* Read from RX uart buffer */
-/*int uart_read(ring_buffer *ptr);
-
-void uart_write(ring_buffer *ptr, int ch);*/
-
-
 #endif /* UART_H_ */

@@ -308,19 +308,6 @@ void dma1_stream5_rx_config(uint32_t rx_buffer){
 
 void usart2_process_data ( gps *gpsPtr, uint8_t *ptr, size_t length ){
 
-	/*const uint8_t *d  = ptr;
-
-	if ( *ptr == '$'){
-		GPIOB->ODR ^= ODR_PB7;
-	}
-
-	for ( ; length > 0; --length, ++d ){
-		USART3->DR = *d;
-		while(!(USART3->SR & SR_TXE)){}
-	}
-
-	while(!(USART3->SR & SR_TC)) {};*/
-
 	if ( !parseMessage(gpsPtr, (char *) ptr, length )){
 
 		sprintf(gpsPtr->gps_buffer,"Location: %f %c, %f %c\n", gpsPtr->_latitude,
@@ -332,8 +319,6 @@ void usart2_process_data ( gps *gpsPtr, uint8_t *ptr, size_t length ){
 			GPIOB->ODR ^= ODR_PB7;
 			while(!(USART3->SR & SR_TXE)){}
 		}
-
-
 
 		while(!(USART3->SR & SR_TC)) {}
 

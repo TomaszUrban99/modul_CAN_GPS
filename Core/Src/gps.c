@@ -7,7 +7,6 @@ int parseMessage ( gps *gpsStruct, char *msg, size_t length){
 			return 1;
 	}
 
-
 		if ( strtok(msg,",") == NULL){
 			return 1;
 		}

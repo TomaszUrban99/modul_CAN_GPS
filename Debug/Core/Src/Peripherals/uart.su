@@ -9,9 +9,9 @@
 ../Core/Src/Peripherals/uart.c:218:6:dma1_stream3_tx_config	16	static
 ../Core/Src/Peripherals/uart.c:259:6:dma1_stream5_rx_config	16	static
 ../Core/Src/Peripherals/uart.c:309:6:usart2_process_data	72	static
-../Core/Src/Peripherals/uart.c:345:6:usart2_dma_check_buffer	24	static
-../Core/Src/Peripherals/uart.c:368:6:DMA1_Stream1_IRQHandler	4	static
-../Core/Src/Peripherals/uart.c:377:6:DMA1_Stream3_IRQHandler	4	static
-../Core/Src/Peripherals/uart.c:387:6:DMA1_Stream6_IRQHandler	4	static
-../Core/Src/Peripherals/uart.c:391:6:uart2_callback	4	static
-../Core/Src/Peripherals/uart.c:396:6:USART3_IRQHandler	4	static
+../Core/Src/Peripherals/uart.c:329:6:usart2_dma_check_buffer	24	static
+../Core/Src/Peripherals/uart.c:352:6:DMA1_Stream1_IRQHandler	4	static
+../Core/Src/Peripherals/uart.c:361:6:DMA1_Stream3_IRQHandler	4	static
+../Core/Src/Peripherals/uart.c:371:6:DMA1_Stream6_IRQHandler	4	static
+../Core/Src/Peripherals/uart.c:375:6:uart2_callback	4	static
+../Core/Src/Peripherals/uart.c:380:6:USART3_IRQHandler	4	static

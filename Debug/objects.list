@@ -1,3 +1,4 @@
+"./Core/Src/Peripherals/can.o"
 "./Core/Src/Peripherals/gpiob.o"
 "./Core/Src/Peripherals/uart.o"
 "./Core/Src/Tasks/tasks.o"
