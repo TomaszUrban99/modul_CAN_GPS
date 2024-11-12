@@ -1,2 +1,3 @@
-../Core/Src/Peripherals/can.c:3:6:can_filter_init	4	static
-../Core/Src/Peripherals/can.c:8:6:can_init	4	static
+../Core/Src/Peripherals/can.c:3:6:can_filter_init	16	static
+../Core/Src/Peripherals/can.c:61:6:can_init	8	static
+../Core/Src/Peripherals/can.c:139:5:can_send	24	static

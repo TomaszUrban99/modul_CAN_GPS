@@ -15,6 +15,8 @@
 #include "gpiob.h"
 #include "uart.h"
 #include "stm32f4xx_hal.h"
+#include "can.h"
+
 
 void usart2_dma_rx_task ( void *queuePtr );
 

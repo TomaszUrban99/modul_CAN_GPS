@@ -48,7 +48,8 @@ Core/Src/Tasks/tasks.o: ../Core/Src/Tasks/tasks.c \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usb.h \
- ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h
+ ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h \
+ /home/tomasz/STM32CubeIDE/workspace_1.16.1/PracaInz_v6/Core/Inc/Peripherals/can.h
 /home/tomasz/STM32CubeIDE/workspace_1.16.1/PracaInz_v6/Core/Inc/Tasks/tasks.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
 ../Core/Inc/FreeRTOSConfig.h:
@@ -99,3 +100,4 @@ Core/Src/Tasks/tasks.o: ../Core/Src/Tasks/tasks.c \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usb.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h:
+/home/tomasz/STM32CubeIDE/workspace_1.16.1/PracaInz_v6/Core/Inc/Peripherals/can.h:

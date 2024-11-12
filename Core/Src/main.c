@@ -9,6 +9,7 @@
 #include "gps.h"
 #include "task.h"
 #include "uart.h"
+#include "can.h"
 
 #define QUEUE_LENGTH								10
 
@@ -28,6 +29,7 @@ void DMA1_Stream5_IRQHandler(void);
 
 void initTask ( void *parameters );
 void usart2_dma_rx_task(void *parameters);
+void can_task (void *parameters );
 
 void blinkLed ( void *parameters ){
 
@@ -44,30 +46,29 @@ int main(void)
 	HAL_Init();
 	SystemClock_Config();
 
+	gpiob_init(); /* Init user's LED's */
 
-  gpiob_init(); /* Init user's LED's */
-
-  /* Create QUEUE's */
-  if ( (gpsReceiver = xQueueCreate(QUEUE_LENGTH,sizeof(uint8_t))) == NULL ){
+	/* Create QUEUE's */
+	if ( (gpsReceiver = xQueueCreate(QUEUE_LENGTH,sizeof(uint8_t))) == NULL ){
 	  GPIOB->ODR |= ODR_PB14;
-  }
+	}
 
-  uart2_rx_tx_init();
-  uart3_rx_tx_init();
-  dma1_init();
-  dma1_stream5_rx_config((uint32_t) usart2.uart_rx_dma_buffer);
+	uart2_rx_tx_init();
+	uart3_rx_tx_init();
+	dma1_init();
+	dma1_stream5_rx_config((uint32_t) usart2.uart_rx_dma_buffer);
 
+	can_init();
 
-  if ( pdPASS != xTaskCreate(usart2_dma_rx_task,"DMAU2",2048,
-			NULL,configMAX_PRIORITIES-1,NULL)){
+	if ( pdPASS != xTaskCreate(usart2_dma_rx_task,"DMAU2",2048,NULL,configMAX_PRIORITIES-1,NULL)){
 		GPIOB->ODR |= ODR_PB7;
 		}
 
-  if ( pdPASS != xTaskCreate(blinkLed, "Init2", 1024, NULL,configMAX_PRIORITIES-1,NULL)){
-	  GPIOB->ODR |= ODR_PB7;
-  }
+	if ( pdPASS != xTaskCreate(can_task,"CAN", 1000, NULL, configMAX_PRIORITIES-1, NULL)){
+	 GPIOB->ODR |= ODR_PB7;
+	}
 
-  vTaskStartScheduler();
+	vTaskStartScheduler();
 
   while (1)
   {
@@ -168,6 +169,24 @@ void usart2_dma_rx_task ( void *queuePtr ){
 		usart2_dma_check_buffer(&usart2, &gpsData);
 	}
 
+}
+
+void can_task ( void *parameters ){
+
+	can_frame msg;
+	msg._can_id = CAN_CLIENT_ID;
+	msg._dlc = 8;
+
+	for ( uint8_t i = 0; i < 8; ++i ){
+		msg._data[i] = i;
+	}
+
+	while(1){
+
+		GPIOB->ODR ^= ODR_PB14;
+		can_send(&msg);
+		vTaskDelay(2000);
+	}
 }
 
 
