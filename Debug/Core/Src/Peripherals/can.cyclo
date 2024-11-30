@@ -1,3 +1,11 @@
-../Core/Src/Peripherals/can.c:3:6:can_filter_init	1
-../Core/Src/Peripherals/can.c:61:6:can_init	3
-../Core/Src/Peripherals/can.c:139:5:can_send	7
+../Drivers/CMSIS/Include/core_cm4.h:1684:22:__NVIC_EnableIRQ	2
+../Drivers/CMSIS/Include/core_cm4.h:1814:22:__NVIC_SetPriority	2
+../Core/Src/Peripherals/can.c:6:6:can_filter_init	1
+../Core/Src/Peripherals/can.c:70:6:can_init	4
+../Core/Src/Peripherals/can.c:155:5:can_send_request	2
+../Core/Src/Peripherals/can.c:183:5:can_process	8
+../Core/Src/Peripherals/can.c:227:10:engine_rpm_receive	2
+../Core/Src/Peripherals/can.c:231:9:engine_load_receive	1
+../Core/Src/Peripherals/can.c:235:9:tank_level_receive	1
+../Core/Src/Peripherals/can.c:239:5:can_receive	4
+../Core/Src/Peripherals/can.c:266:5:can_send	7

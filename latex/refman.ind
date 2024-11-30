@@ -1,0 +1,93 @@
+\begin{theindex}
+
+  \item {\_sbrk}
+    \subitem {sysmem.c}, \hyperpage{30}
+
+  \indexspace
+
+  \item {CMSIS}, \hyperpage{7}
+  \item {Core/Inc/main.h}, \hyperpage{17}
+  \item {Core/Inc/stm32f4xx\_it.h}, \hyperpage{19}
+  \item {Core/Src/stm32f4xx\_hal\_msp.c}, \hyperpage{21}
+  \item {Core/Src/stm32f4xx\_hal\_timebase\_tim.c}, \hyperpage{24}
+  \item {Core/Src/stm32f4xx\_it.c}, \hyperpage{27}
+  \item {Core/Src/syscalls.c}, \hyperpage{28}
+  \item {Core/Src/sysmem.c}, \hyperpage{29}
+  \item {Core/Src/system\_stm32f4xx.c}, \hyperpage{31}
+
+  \indexspace
+
+  \item {Error\_Handler}
+    \subitem {main.h}, \hyperpage{19}
+
+  \indexspace
+
+  \item {gps}, \hyperpage{15}
+
+  \indexspace
+
+  \item {HAL\_ETH\_MspDeInit}
+    \subitem {stm32f4xx\_hal\_msp.c}, \hyperpage{22}
+  \item {HAL\_ETH\_MspInit}
+    \subitem {stm32f4xx\_hal\_msp.c}, \hyperpage{22}
+  \item {HAL\_InitTick}
+    \subitem {stm32f4xx\_hal\_timebase\_tim.c}, \hyperpage{25}
+  \item {HAL\_MspInit}
+    \subitem {stm32f4xx\_hal\_msp.c}, \hyperpage{22}
+  \item {HAL\_PCD\_MspDeInit}
+    \subitem {stm32f4xx\_hal\_msp.c}, \hyperpage{22}
+  \item {HAL\_PCD\_MspInit}
+    \subitem {stm32f4xx\_hal\_msp.c}, \hyperpage{23}
+  \item {HAL\_ResumeTick}
+    \subitem {stm32f4xx\_hal\_timebase\_tim.c}, \hyperpage{26}
+  \item {HAL\_SuspendTick}
+    \subitem {stm32f4xx\_hal\_timebase\_tim.c}, \hyperpage{26}
+  \item {HAL\_UART\_MspDeInit}
+    \subitem {stm32f4xx\_hal\_msp.c}, \hyperpage{23}
+  \item {HAL\_UART\_MspInit}
+    \subitem {stm32f4xx\_hal\_msp.c}, \hyperpage{24}
+  \item {HSE\_VALUE}
+    \subitem {STM32F4xx\_System\_Private\_Includes}, \hyperpage{9}
+  \item {HSI\_VALUE}
+    \subitem {STM32F4xx\_System\_Private\_Includes}, \hyperpage{9}
+
+  \indexspace
+
+  \item {main.h}
+    \subitem {Error\_Handler}, \hyperpage{19}
+
+  \indexspace
+
+  \item {stm32f4xx\_hal\_msp.c}
+    \subitem {HAL\_ETH\_MspDeInit}, \hyperpage{22}
+    \subitem {HAL\_ETH\_MspInit}, \hyperpage{22}
+    \subitem {HAL\_MspInit}, \hyperpage{22}
+    \subitem {HAL\_PCD\_MspDeInit}, \hyperpage{22}
+    \subitem {HAL\_PCD\_MspInit}, \hyperpage{23}
+    \subitem {HAL\_UART\_MspDeInit}, \hyperpage{23}
+    \subitem {HAL\_UART\_MspInit}, \hyperpage{24}
+  \item {stm32f4xx\_hal\_timebase\_tim.c}
+    \subitem {HAL\_InitTick}, \hyperpage{25}
+    \subitem {HAL\_ResumeTick}, \hyperpage{26}
+    \subitem {HAL\_SuspendTick}, \hyperpage{26}
+  \item {Stm32f4xx\_system}, \hyperpage{8}
+  \item {STM32F4xx\_System\_Private\_Defines}, \hyperpage{10}
+  \item {STM32F4xx\_System\_Private\_FunctionPrototypes}, 
+		\hyperpage{11}
+  \item {STM32F4xx\_System\_Private\_Functions}, \hyperpage{11}
+    \subitem {SystemCoreClockUpdate}, \hyperpage{11}
+    \subitem {SystemInit}, \hyperpage{12}
+  \item {STM32F4xx\_System\_Private\_Includes}, \hyperpage{9}
+    \subitem {HSE\_VALUE}, \hyperpage{9}
+    \subitem {HSI\_VALUE}, \hyperpage{9}
+  \item {STM32F4xx\_System\_Private\_Macros}, \hyperpage{10}
+  \item {STM32F4xx\_System\_Private\_TypesDefinitions}, \hyperpage{9}
+  \item {STM32F4xx\_System\_Private\_Variables}, \hyperpage{10}
+  \item {sysmem.c}
+    \subitem {\_sbrk}, \hyperpage{30}
+  \item {SystemCoreClockUpdate}
+    \subitem {STM32F4xx\_System\_Private\_Functions}, \hyperpage{11}
+  \item {SystemInit}
+    \subitem {STM32F4xx\_System\_Private\_Functions}, \hyperpage{12}
+
+\end{theindex}

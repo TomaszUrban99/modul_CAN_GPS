@@ -1,6 +1,8 @@
 #include "main.h"
 
 #include "FreeRTOS.h"
+
+#include <event_groups.h>
 #include <queue.h>
 #include <string.h>
 
@@ -10,34 +12,48 @@
 #include "task.h"
 #include "uart.h"
 #include "can.h"
+#include "packet.h"
 
 #define QUEUE_LENGTH								10
 
+
 /************** DATA STRUCTURES *********************/
 uart_ds usart2;
-gps gpsData;
+struct packet packetData;
 
 /**************** SYNCHRONISE ***********************/
 QueueHandle_t gpsReceiver;
+QueueHandle_t CAN_receiver;
+
+/* Event group */
+EventGroupHandle_t dataReceived;
+
+/* Event bits */
+#define OBD_MODULE									0x01
+#define GPS_MODULE									0x02
+#define PACKET_PREPARED								0x04
+
 TaskHandle_t ptr = NULL;
 BaseType_t xHigherPriorityTaskWoken;
+
+can_frame msg_receive;
+
+/******************************************************/
+#define MESSAGE_LENGTH								128
 
 void SystemClock_Config(void);
 
 void USART2_IRQHandler(void);
 void DMA1_Stream5_IRQHandler(void);
 
-void initTask ( void *parameters );
+void CAN1_RX0_IRQHandler(void);
+void CAN1_RX1_IRQHandler(void);
+
+
 void usart2_dma_rx_task(void *parameters);
-void can_task (void *parameters );
+void obd_module(void *parameters);
+void send_task(void *parameters );
 
-void blinkLed ( void *parameters ){
-
-	while(1){
-		GPIOB->ODR ^= ODR_PB14;
-		vTaskDelay(1000);
-	}
-}
 
 int main(void)
 {
@@ -53,6 +69,24 @@ int main(void)
 	  GPIOB->ODR |= ODR_PB14;
 	}
 
+	if ( (CAN_receiver = xQueueCreate(QUEUE_LENGTH,sizeof(uint8_t))) == NULL ){
+	  GPIOB->ODR |= ODR_PB14;
+	}
+
+
+	/* Create event group */
+	if ( (dataReceived = xEventGroupCreate()) == NULL ){
+		GPIOB->ODR |= ODR_PB14;
+	}
+
+	/* Event group description
+	 *
+	 * Bit 0 - received and processed data from OBD
+	 * Bi1 1 - received and processed data from GPS
+	 * Bit 2 - created packet to send
+	 *
+	 */
+
 	uart2_rx_tx_init();
 	uart3_rx_tx_init();
 	dma1_init();
@@ -60,12 +94,16 @@ int main(void)
 
 	can_init();
 
-	if ( pdPASS != xTaskCreate(usart2_dma_rx_task,"DMAU2",2048,NULL,configMAX_PRIORITIES-1,NULL)){
+	if ( pdPASS != xTaskCreate(usart2_dma_rx_task,"DMAU2",256,NULL,configMAX_PRIORITIES-1,NULL)){
 		GPIOB->ODR |= ODR_PB7;
 		}
 
-	if ( pdPASS != xTaskCreate(can_task,"CAN", 1000, NULL, configMAX_PRIORITIES-1, NULL)){
+	if ( pdPASS != xTaskCreate(obd_module,"CAN", 256, NULL, configMAX_PRIORITIES-1, NULL)){
 	 GPIOB->ODR |= ODR_PB7;
+	}
+
+	if ( pdPASS != xTaskCreate(send_task,"SEND", 256, NULL, configMAX_PRIORITIES -1, NULL)){
+		GPIOB->ODR |= ODR_PB7;
 	}
 
 	vTaskStartScheduler();
@@ -73,6 +111,43 @@ int main(void)
   while (1)
   {
   }
+}
+
+void CAN1_RX0_IRQHandler(void){
+
+	if ( CAN1->RF0R & CAN_RF0R_FMP0 ){
+
+		/* FIFO No */
+		uint8_t d = 0;
+
+		xHigherPriorityTaskWoken = pdFALSE;
+
+		if ( xQueueSendFromISR(CAN_receiver,&d,&xHigherPriorityTaskWoken) != pdPASS ){
+			GPIOB->ODR |= ODR_PB7;
+		}
+
+		/* Receive message - read CAN frame */
+		can_receive(&msg_receive, d);
+
+		portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+
+	}
+
+}
+
+void CAN1_RX1_IRQHandler(void){
+
+	if ( CAN1->RF1R & CAN_RF1R_FMP1){
+
+			uint8_t d = 1;
+			xHigherPriorityTaskWoken = pdFALSE;
+
+			if ( xQueueSendFromISR(CAN_receiver,&d,&xHigherPriorityTaskWoken) == errQUEUE_FULL ){
+				GPIOB->ODR |= ODR_PB7;
+			}
+
+			portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+	}
 }
 
 void USART2_IRQHandler(void){
@@ -85,7 +160,7 @@ void USART2_IRQHandler(void){
 		USART2->DR;
 
 		/* Check if message has been sent correctly */
-		if( xQueueSendFromISR(gpsReceiver,&d,&xHigherPriorityTaskWoken) != pdTRUE ){
+		if( xQueueSendFromISR(gpsReceiver,&d,&xHigherPriorityTaskWoken) != pdPASS ){
 			GPIOB->ODR |= ODR_PB7;
 		}
 
@@ -166,9 +241,70 @@ void usart2_dma_rx_task ( void *queuePtr ){
 		xQueueReceive(gpsReceiver, &d, portMAX_DELAY);
 
 		/* Process message */
-		usart2_dma_check_buffer(&usart2, &gpsData);
+		usart2_dma_check_buffer(&usart2, &packetData._gps_data);
+
+		/* Set bits */
+		xEventGroupSetBits(dataReceived,GPS_MODULE);
 	}
 
+}
+
+void send_task ( void *parameters ){
+
+	/* Initialize array for message */
+	uint8_t message[MESSAGE_LENGTH];
+	uint8_t message_length;
+
+	while (1) {
+
+		xEventGroupWaitBits(dataReceived,3, pdTRUE, pdTRUE, portMAX_DELAY);
+		message_length = prepare_json( &packetData,message);
+
+		for ( uint8_t i = 0; i < message_length; ++i ){
+
+				USART3->DR = message[i];
+
+				GPIOB->ODR ^= ODR_PB7;
+			while(!(USART3->SR & SR_TXE)){}
+
+			while(!(USART3->SR & SR_TC)) {}
+		}
+
+		xEventGroupSetBits(dataReceived,PACKET_PREPARED);
+	}
+}
+
+void obd_module ( void *parameters ){
+
+	uint8_t request_code[] = { CAN_ENGINE_RPM, CAN_ENGINE_LOAD, CAN_TANK_LEVEL};
+	can_frame msg_transmit;
+
+	/* Request code array length */
+	uint8_t request_code_array_length = sizeof(request_code)/sizeof(uint8_t);
+	uint8_t d = 0;
+
+	while(1){
+
+
+		for ( int i = 0; i < request_code_array_length; ++i){
+			can_send_request(&msg_transmit,request_code[i]);
+		}
+
+		for ( int i = 0; i < request_code_array_length; ++i){
+
+			/* Wait until new message incomes */
+			xQueueReceive(CAN_receiver,&d, portMAX_DELAY);
+
+			/* Receive and process message */
+
+			can_process(&msg_receive, &packetData._obd_data);
+		}
+
+		/* Send notification that all responses have been received ? Event group ?*/
+		xEventGroupSetBits(dataReceived,OBD_MODULE);
+		xEventGroupWaitBits(dataReceived,PACKET_PREPARED, pdTRUE, pdTRUE, portMAX_DELAY);
+
+	}
 }
 
 void can_task ( void *parameters ){

@@ -55,6 +55,8 @@ void uart2_rx_tx_init();
 
 void uart3_rx_tx_init(void);
 
+void uart5_rx_tx_init(void);
+
 /************************************************************************************************/
 
 /************************************ DMA *******************************************************/
@@ -66,6 +68,10 @@ void dma1_stream1_rx_config(uint32_t dst_buffer);
 void dma1_stream3_tx_config(uint32_t source_buffer, uint32_t length);
 
 void dma1_stream5_rx_config(uint32_t rx_buffer);
+
+void dma1_stream0_rx_config(uint32_t rx_buffer);
+
+void dma1_stream7_tx_config(uint32_t source_buffer, uint32_t length );
 
 /* DMA check & process data */
 void usart2_dma_check_buffer ( uart_ds *ptr, gps *gpsPtr );

@@ -1,0 +1,64 @@
+\@ifundefined {etoctocstyle}{\let \etoc@startlocaltoc \@gobble \let \etoc@settocdepth \@gobble \let \etoc@depthtag \@gobble \let \etoc@setlocaltop \@gobble }{}
+\contentsline {chapter}{\numberline {1}Module Index}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Modules}{1}{section.1.1}%
+\contentsline {chapter}{\numberline {2}Class Index}{3}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Class List}{3}{section.2.1}%
+\contentsline {chapter}{\numberline {3}File Index}{5}{chapter.3}%
+\contentsline {section}{\numberline {3.1}File List}{5}{section.3.1}%
+\contentsline {chapter}{\numberline {4}Module Documentation}{7}{chapter.4}%
+\contentsline {section}{\numberline {4.1}CMSIS}{7}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Detailed Description}{8}{subsection.4.1.1}%
+\contentsline {section}{\numberline {4.2}Stm32f4xx\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}system}{8}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Detailed Description}{9}{subsection.4.2.1}%
+\contentsline {section}{\numberline {4.3}STM32\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}F4xx\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}System\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Private\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Includes}{9}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Detailed Description}{9}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Macro Definition Documentation}{9}{subsection.4.3.2}%
+\contentsline {subsubsection}{\numberline {4.3.2.1}HSE\_VALUE}{9}{subsubsection.4.3.2.1}%
+\contentsline {subsubsection}{\numberline {4.3.2.2}HSI\_VALUE}{9}{subsubsection.4.3.2.2}%
+\contentsline {section}{\numberline {4.4}STM32\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}F4xx\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}System\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Private\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Types\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Definitions}{9}{section.4.4}%
+\contentsline {section}{\numberline {4.5}STM32\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}F4xx\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}System\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Private\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Defines}{10}{section.4.5}%
+\contentsline {section}{\numberline {4.6}STM32\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}F4xx\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}System\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Private\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Macros}{10}{section.4.6}%
+\contentsline {section}{\numberline {4.7}STM32\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}F4xx\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}System\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Private\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Variables}{10}{section.4.7}%
+\contentsline {subsection}{\numberline {4.7.1}Detailed Description}{11}{subsection.4.7.1}%
+\contentsline {section}{\numberline {4.8}STM32\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}F4xx\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}System\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Private\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Function\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Prototypes}{11}{section.4.8}%
+\contentsline {section}{\numberline {4.9}STM32\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}F4xx\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}System\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Private\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Functions}{11}{section.4.9}%
+\contentsline {subsection}{\numberline {4.9.1}Detailed Description}{11}{subsection.4.9.1}%
+\contentsline {subsection}{\numberline {4.9.2}Function Documentation}{11}{subsection.4.9.2}%
+\contentsline {subsubsection}{\numberline {4.9.2.1}SystemCoreClockUpdate()}{12}{subsubsection.4.9.2.1}%
+\contentsline {subsubsection}{\numberline {4.9.2.2}SystemInit()}{12}{subsubsection.4.9.2.2}%
+\contentsline {chapter}{\numberline {5}Class Documentation}{15}{chapter.5}%
+\contentsline {section}{\numberline {5.1}gps Struct Reference}{15}{section.5.1}%
+\contentsline {chapter}{\numberline {6}File Documentation}{17}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Core/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Inc/main.h File Reference}{17}{section.6.1}%
+\contentsline {subsection}{\numberline {6.1.1}Detailed Description}{19}{subsection.6.1.1}%
+\contentsline {subsection}{\numberline {6.1.2}Function Documentation}{19}{subsection.6.1.2}%
+\contentsline {subsubsection}{\numberline {6.1.2.1}Error\_Handler()}{19}{subsubsection.6.1.2.1}%
+\contentsline {section}{\numberline {6.2}Core/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Inc/stm32f4xx\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}it.h File Reference}{19}{section.6.2}%
+\contentsline {subsection}{\numberline {6.2.1}Detailed Description}{20}{subsection.6.2.1}%
+\contentsline {section}{\numberline {6.3}Core/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Src/stm32f4xx\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}hal\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}msp.c File Reference}{21}{section.6.3}%
+\contentsline {subsection}{\numberline {6.3.1}Detailed Description}{21}{subsection.6.3.1}%
+\contentsline {subsection}{\numberline {6.3.2}Function Documentation}{22}{subsection.6.3.2}%
+\contentsline {subsubsection}{\numberline {6.3.2.1}HAL\_ETH\_MspDeInit()}{22}{subsubsection.6.3.2.1}%
+\contentsline {subsubsection}{\numberline {6.3.2.2}HAL\_ETH\_MspInit()}{22}{subsubsection.6.3.2.2}%
+\contentsline {subsubsection}{\numberline {6.3.2.3}HAL\_MspInit()}{22}{subsubsection.6.3.2.3}%
+\contentsline {subsubsection}{\numberline {6.3.2.4}HAL\_PCD\_MspDeInit()}{23}{subsubsection.6.3.2.4}%
+\contentsline {subsubsection}{\numberline {6.3.2.5}HAL\_PCD\_MspInit()}{23}{subsubsection.6.3.2.5}%
+\contentsline {subsubsection}{\numberline {6.3.2.6}HAL\_UART\_MspDeInit()}{23}{subsubsection.6.3.2.6}%
+\contentsline {subsubsection}{\numberline {6.3.2.7}HAL\_UART\_MspInit()}{24}{subsubsection.6.3.2.7}%
+\contentsline {section}{\numberline {6.4}Core/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Src/stm32f4xx\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}hal\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}timebase\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}tim.c File Reference}{24}{section.6.4}%
+\contentsline {subsection}{\numberline {6.4.1}Detailed Description}{25}{subsection.6.4.1}%
+\contentsline {subsection}{\numberline {6.4.2}Function Documentation}{25}{subsection.6.4.2}%
+\contentsline {subsubsection}{\numberline {6.4.2.1}HAL\_InitTick()}{25}{subsubsection.6.4.2.1}%
+\contentsline {subsubsection}{\numberline {6.4.2.2}HAL\_ResumeTick()}{26}{subsubsection.6.4.2.2}%
+\contentsline {subsubsection}{\numberline {6.4.2.3}HAL\_SuspendTick()}{26}{subsubsection.6.4.2.3}%
+\contentsline {section}{\numberline {6.5}Core/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Src/stm32f4xx\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}it.c File Reference}{27}{section.6.5}%
+\contentsline {subsection}{\numberline {6.5.1}Detailed Description}{28}{subsection.6.5.1}%
+\contentsline {section}{\numberline {6.6}Core/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Src/syscalls.c File Reference}{28}{section.6.6}%
+\contentsline {subsection}{\numberline {6.6.1}Detailed Description}{29}{subsection.6.6.1}%
+\contentsline {section}{\numberline {6.7}Core/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Src/sysmem.c File Reference}{29}{section.6.7}%
+\contentsline {subsection}{\numberline {6.7.1}Detailed Description}{30}{subsection.6.7.1}%
+\contentsline {subsection}{\numberline {6.7.2}Function Documentation}{30}{subsection.6.7.2}%
+\contentsline {subsubsection}{\numberline {6.7.2.1}\_sbrk()}{30}{subsubsection.6.7.2.1}%
+\contentsline {section}{\numberline {6.8}Core/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Src/system\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}stm32f4xx.c File Reference}{31}{section.6.8}%
+\contentsline {subsection}{\numberline {6.8.1}Detailed Description}{31}{subsection.6.8.1}%
+\contentsline {chapter}{Index}{33}{section*.39}%

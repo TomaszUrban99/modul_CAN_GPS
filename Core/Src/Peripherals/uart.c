@@ -155,6 +155,39 @@ void uart3_rx_tx_init(void){
 	NVIC_EnableIRQ(USART3_IRQn);
 }
 
+void uart5_rx_tx_init(void){
+
+	/* Configure GPIO pins (PORTD, PORTC) */
+
+	/* Enable access to clock for pins PORTD and PORTC */
+	RCC->AHB1ENR |= RCC_GPIOC_EN;
+	RCC->AHB1ENR |= RCC_GPIOD_EN;
+
+	/* Set GPIO PC12 mode to alternate mode */
+	GPIOC->MODER |= MODE_PC12_1;
+	GPIOC->MODER &= ~MODE_PC12_0;
+
+	/* Set alternate function to usart tx */
+	GPIOC->AFR[1] &= ~AFRH12_3;
+	GPIOC->AFR[1] |= AFRH12_2;
+	GPIOC->AFR[1] |= AFRH12_1;
+	GPIOC->AFR[1] |= AFRH12_0;
+
+	/* Set GPIO PD2 mode to alternate mode */
+	GPIOD->MODER |= MODE_PD2_1;
+	GPIOD->MODER &= ~MODE_PD2_0;
+
+	/* Set alternate function to usart rx */
+	GPIOD->AFR[0] &= ~AFRL2_3;
+	GPIOD->AFR[0] |= AFRL2_2;
+	GPIOD->AFR[0] |= AFRL2_1;
+	GPIOD->AFR[0] |= AFRL2_0;
+
+
+
+
+}
+
 void dma1_init(void){
 
 	/* Enable clock access to DMA1 */
@@ -310,7 +343,9 @@ void usart2_process_data ( gps *gpsPtr, uint8_t *ptr, size_t length ){
 
 	if ( !parseMessage(gpsPtr, (char *) ptr, length )){
 
-		sprintf(gpsPtr->gps_buffer,"Location: %f %c, %f %c\n", gpsPtr->_latitude,
+		/*
+		 *
+		 sprintf(gpsPtr->gps_buffer,"Location: %f %c, %f %c\n", gpsPtr->_latitude,
 				gpsPtr->_latitude_attitude, gpsPtr->_longitude, gpsPtr->_longitude_attitude);
 
 
@@ -321,6 +356,7 @@ void usart2_process_data ( gps *gpsPtr, uint8_t *ptr, size_t length ){
 		}
 
 		while(!(USART3->SR & SR_TC)) {}
+		*/
 
 	}
 
