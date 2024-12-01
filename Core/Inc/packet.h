@@ -29,4 +29,6 @@ typedef struct packet {
 int prepare_json ( struct packet *packet,
 		uint8_t *packet_json );
 
+
+
 #endif /* INC_PACKET_H_ */

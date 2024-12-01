@@ -5,6 +5,7 @@
 #include <event_groups.h>
 #include <queue.h>
 #include <string.h>
+#include <semphr.h>
 
 #include "cmsis_os.h"
 #include "gpiob.h"
@@ -19,11 +20,15 @@
 
 /************** DATA STRUCTURES *********************/
 uart_ds usart2;
+uart_ds usart5;
+
 struct packet packetData;
 
 /**************** SYNCHRONISE ***********************/
 QueueHandle_t gpsReceiver;
 QueueHandle_t CAN_receiver;
+
+SemaphoreHandle_t GSM_receiver;
 
 /* Event group */
 EventGroupHandle_t dataReceived;
@@ -44,6 +49,7 @@ can_frame msg_receive;
 void SystemClock_Config(void);
 
 void USART2_IRQHandler(void);
+void USART5_IRQHandler(void);
 void DMA1_Stream5_IRQHandler(void);
 
 void CAN1_RX0_IRQHandler(void);
@@ -73,6 +79,11 @@ int main(void)
 	  GPIOB->ODR |= ODR_PB14;
 	}
 
+	/* Create SEMAPHORES */
+	if ( (GSM_receiver = xSemaphoreCreateBinary()) == NULL ){
+		GPIOB->ODR |= ODR_PB14;
+	}
+
 
 	/* Create event group */
 	if ( (dataReceived = xEventGroupCreate()) == NULL ){
@@ -89,8 +100,10 @@ int main(void)
 
 	uart2_rx_tx_init();
 	uart3_rx_tx_init();
+
 	dma1_init();
 	dma1_stream5_rx_config((uint32_t) usart2.uart_rx_dma_buffer);
+	dma1_stream0_rx_config((uint32_t) usart5.uart_rx_dma_buffer);
 
 	can_init();
 
@@ -165,6 +178,39 @@ void USART2_IRQHandler(void){
 		}
 
 		portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+	}
+}
+
+void USART5_IRQHandler (void){
+
+	if ( UART5->SR & SR_IDLE ){
+
+		xHigherPriorityTaskWoken = pdFALSE;
+		UART5->DR;
+
+		if ( xSemaphoreGiveFromISR(GSM_receiver,&xHigherPriorityTaskWoken) != pdPASS ){
+			GPIOB->ODR |= ODR_PB7;
+		}
+
+		portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+	}
+
+}
+
+void DMA1_Stream0_IRQHandler(void){
+
+	xHigherPriorityTaskWoken = pdFALSE;
+
+	if (((DMA1->HISR) & LIFSR_CTCIF0)){
+
+		xSemaphoreGiveFromISR(GSM_receiver,&xHigherPriorityTaskWoken);
+		DMA1->HIFCR |= LIFCR_CTCIF0;
+	}
+
+	if (((DMA1->HISR) & LIFSR_CHTIF0)){
+
+		xSemaphoreGiveFromISR(gpsReceiver,&xHigherPriorityTaskWoken);
+		DMA1->HIFCR |= LIFCR_CHTIF0;
 	}
 }
 
@@ -249,28 +295,28 @@ void usart2_dma_rx_task ( void *queuePtr ){
 
 }
 
+void usart5_dma_rx_tx_task ( void *queuePtr ){
+
+	while(1){
+
+	}
+}
+
 void send_task ( void *parameters ){
 
 	/* Initialize array for message */
-	uint8_t message[MESSAGE_LENGTH];
-	uint8_t message_length;
+	/*uint8_t message[MESSAGE_LENGTH];
+	uint8_t message_length;*/
 
 	while (1) {
 
-		xEventGroupWaitBits(dataReceived,3, pdTRUE, pdTRUE, portMAX_DELAY);
-		message_length = prepare_json( &packetData,message);
+		/*xEventGroupWaitBits(dataReceived,3, pdTRUE, pdTRUE, portMAX_DELAY);*/
+		/* message_length = prepare_json( &packetData,message); */
 
-		for ( uint8_t i = 0; i < message_length; ++i ){
+		xSemaphoreTake(GSM_receiver,portMAX_DELAY);
+		uart5_dma_check_buffer(&usart5);
 
-				USART3->DR = message[i];
-
-				GPIOB->ODR ^= ODR_PB7;
-			while(!(USART3->SR & SR_TXE)){}
-
-			while(!(USART3->SR & SR_TC)) {}
-		}
-
-		xEventGroupSetBits(dataReceived,PACKET_PREPARED);
+		/*xEventGroupSetBits(dataReceived,PACKET_PREPARED);*/
 	}
 }
 

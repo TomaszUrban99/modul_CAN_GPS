@@ -134,6 +134,13 @@
 
 /***************** LIFCR *********************/
 
+/* Stream 0 UART5 RX */
+#define LIFCR_CTCIF0				(1U << 5)
+#define LIFCR_CHTIF0				(1U << 4)
+#define LIFCR_CTEIF0				(1U << 3)
+#define LIFCR_CDMEIF0				(1U << 2)
+#define LIFCR_CFEIF0				(1U << 0)
+
 /* Stream 1 USART3 RX */
 #define LIFCR_CTCIF1				(1U << 11)
 #define LIFCR_CHTIF1				(1U << 10)
@@ -149,6 +156,14 @@
 #define LIFCR_CFEIF3				(1U << 22)
 
 /***************** LIFSR **********************/
+
+/* Stream 0 UART5 RX */
+#define LIFSR_CTCIF0				(1U << 5)
+#define LIFSR_CHTIF0				(1U << 4)
+#define LIFSR_CTEIF0				(1U << 3)
+#define LIFSR_CDMEIF0				(1U << 2)
+#define LIFSR_CFEIF0				(1U << 0)
+
 
 /* Stream 1 USART3 RX */
 #define LIFSR_CTCIF1				(1U << 11)

@@ -20,6 +20,7 @@
 
 #define BUFFER_SIZE_USART2										512
 #define BUFFER_SIZE_USART3										128
+#define BUFFER_SIZE_UART5										64
 
 /******************************* DATA STRUCTURE *************************************************/
 
@@ -36,12 +37,19 @@ typedef struct uart_ds {
 
 } uart_ds;
 
+#define GET_DMA_DATA_LENGTH_UART5()									(DMA1_Stream0->NDTR)
 #define GET_DMA_DATA_LENGTH_USART2()								(DMA1_Stream5->NDTR)
 
 /********************************* BAUDRATE *****************************************************/
 
 #define USART2_BAUDRATE 								9600
 #define USART3_BAUDRATE									9600
+#define UART5_BAUDRATE									9600
+
+
+/********************************** USART CLOCK ACCESS ******************************************/
+
+#define RCC_UART5_EN												(	1U << 20	)
 
 uint16_t compute_uart_div ( uint32_t peripheralClock, uint32_t baudRate );
 
@@ -67,17 +75,26 @@ void dma1_stream1_rx_config(uint32_t dst_buffer);
 
 void dma1_stream3_tx_config(uint32_t source_buffer, uint32_t length);
 
+/* UART2 RX buffer */
 void dma1_stream5_rx_config(uint32_t rx_buffer);
 
+/* UART5 RX buffer */
 void dma1_stream0_rx_config(uint32_t rx_buffer);
 
+/* UART5 TX buffer */
 void dma1_stream7_tx_config(uint32_t source_buffer, uint32_t length );
 
 /* DMA check & process data */
 void usart2_dma_check_buffer ( uart_ds *ptr, gps *gpsPtr );
 
+void uart5_process_data ( uint8_t *ptr, size_t length );
+
+void uart5_dma_check_buffer( uart_ds *ptr );
+
 void usart2_process_data ( gps *gpsPtr, uint8_t *ptr, size_t length );
 /*void uart_read(USART_TypeDef *USART, int *ch);*/
+
+
 
 
 /*************************** RETARGETING PRINTF *************************************************/
