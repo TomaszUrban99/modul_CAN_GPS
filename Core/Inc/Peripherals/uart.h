@@ -39,6 +39,7 @@ typedef struct uart_ds {
 
 #define GET_DMA_DATA_LENGTH_UART5()									(DMA1_Stream0->NDTR)
 #define GET_DMA_DATA_LENGTH_USART2()								(DMA1_Stream5->NDTR)
+#define GET_DMA_DATA_LENGTH_USART3()								(DMA1_Stream1->NDTR)
 
 /********************************* BAUDRATE *****************************************************/
 
@@ -71,8 +72,10 @@ void uart5_rx_tx_init(void);
 
 void dma1_init(void);
 
+/* UART3 RX buffer */
 void dma1_stream1_rx_config(uint32_t dst_buffer);
 
+/* UART3 TX buffer */
 void dma1_stream3_tx_config(uint32_t source_buffer, uint32_t length);
 
 /* UART2 RX buffer */
@@ -87,9 +90,13 @@ void dma1_stream7_tx_config(uint32_t source_buffer, uint32_t length );
 /* DMA check & process data */
 void usart2_dma_check_buffer ( uart_ds *ptr, gps *gpsPtr );
 
-void uart5_process_data ( uint8_t *ptr, size_t length );
+void usart3_process_data ( uint8_t *ptr, size_t length, char *response );
 
-void uart5_dma_check_buffer( uart_ds *ptr );
+int usart3_dma_check_buffer( uart_ds *ptr, char *response );
+
+int usart3_dma_check_sim800l_answer( uart_ds *ptr );
+
+int usart3_process_sim800l_answer( uint8_t *ptr, size_t length );
 
 void usart2_process_data ( gps *gpsPtr, uint8_t *ptr, size_t length );
 /*void uart_read(USART_TypeDef *USART, int *ch);*/
@@ -105,9 +112,6 @@ int __io_putchar(int ch);
 
 /* static void uart_callback(void);*/
 
-void DMA1_Stream1_IRQHandler(void);
-
-void DMA1_Stream3_IRQHandler(void);
 
 
 #endif /* UART_H_ */

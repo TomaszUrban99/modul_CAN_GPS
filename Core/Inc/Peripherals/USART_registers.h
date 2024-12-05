@@ -195,6 +195,13 @@
 #define HIFCR_CDMEIF6				(1U << 18)
 #define HIFCR_CFEIF6				(1U << 16)
 
+/* Stream 7 UART5 TX */
+#define HIFCR_CTCIF7				(1U << 27)
+#define HIFCR_CHTIF7				(1U << 26)
+#define HIFCR_CTEIF7				(1U << 25)
+#define HIFCR_CDMEIF7				(1U << 24)
+#define HIFCR_CFEIF7				(1U << 22)
+
 /****************** HIFSR ***********************/
 
 /* Stream 5 USART2 RX */
@@ -210,6 +217,13 @@
 #define HIFSR_CTEIF6				(1U << 19)
 #define HIFSR_CDMEIF6				(1U << 18)
 #define HIFSR_CFEIF6				(1U << 16)
+
+/* Stream 7 UART5 TX */
+#define HIFSR_CTCIF7				(1U << 27)
+#define HIFSR_CHTIF7				(1U << 26)
+#define HIFSR_CTEIF7				(1U << 25)
+#define HIFSR_CDMEIF7				(1U << 24)
+#define HIFSR_CFEIF7				(1U << 22)
 
 /******************** DMA_SxCR ********************/
 

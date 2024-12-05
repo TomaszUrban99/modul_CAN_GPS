@@ -1,0 +1,2 @@
+../Core/Src/gsm_module.c:14:5:activate_wireless_conn	1
+../Core/Src/gsm_module.c:75:5:configure_module	1

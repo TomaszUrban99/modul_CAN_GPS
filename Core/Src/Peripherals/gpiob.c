@@ -19,5 +19,8 @@ void gpiob_init(void){
 	GPIOB->MODER &= ~MODE_PB0_1;
 	GPIOB->MODER |= MODE_PB0_0;
 
+	GPIOB->MODER &= ~MODE_PB1_1;
+	GPIOB->MODER |= MODE_PB1_0;
+
 }
 

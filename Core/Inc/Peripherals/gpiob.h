@@ -24,7 +24,11 @@
 #define MODE_PB0_1				(1U << 1)
 #define MODE_PB0_0				(1U << 0)
 
+#define MODE_PB1_1				(1U << 3)
+#define MODE_PB1_0				(1U << 2)
+
 #define ODR_PB0					(1U << 0)
+#define ODR_PB1					(1U << 1)
 #define ODR_PB7					(1U << 7)
 #define ODR_PB14				(1U << 14)
 

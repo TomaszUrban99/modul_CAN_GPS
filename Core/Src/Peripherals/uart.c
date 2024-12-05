@@ -147,11 +147,13 @@ void uart3_rx_tx_init(void){
 
 	/* Enable receive and transfer interrupt */
 	/* USART3->CR1 |= CR1_TCIE | CR1_RXNEIE;*/
+	USART3->CR1 |= CR1_IDLEIE;
 
 	/* Enable UART */
 	USART3->CR1 |= CR1_UE;
 
 	/* Enable interrupt in NVIC */
+	NVIC_SetPriority(USART3_IRQn,15);
 	NVIC_EnableIRQ(USART3_IRQn);
 }
 
@@ -168,20 +170,20 @@ void uart5_rx_tx_init(void){
 	GPIOC->MODER &= ~MODE_PC12_0;
 
 	/* Set alternate function to usart tx */
-	GPIOC->AFR[1] &= ~AFRH12_3;
-	GPIOC->AFR[1] |= AFRH12_2;
-	GPIOC->AFR[1] |= AFRH12_1;
-	GPIOC->AFR[1] |= AFRH12_0;
+	GPIOC->AFR[1] |= AFRH12_3;
+	GPIOC->AFR[1] &= ~AFRH12_2;
+	GPIOC->AFR[1] &= ~AFRH12_1;
+	GPIOC->AFR[1] &= ~AFRH12_0;
 
 	/* Set GPIO PD2 mode to alternate mode */
 	GPIOD->MODER |= MODE_PD2_1;
 	GPIOD->MODER &= ~MODE_PD2_0;
 
-	/* Set alternate function to usart rx */
-	GPIOD->AFR[0] &= ~AFRL2_3;
-	GPIOD->AFR[0] |= AFRL2_2;
-	GPIOD->AFR[0] |= AFRL2_1;
-	GPIOD->AFR[0] |= AFRL2_0;
+	/* Set alternate function to usart rx AF8 */
+	GPIOD->AFR[0] |= AFRL2_3;
+	GPIOD->AFR[0] &= ~AFRL2_2;
+	GPIOD->AFR[0] &= ~AFRL2_1;
+	GPIOD->AFR[0] &= ~AFRL2_0;
 
 	/* Configure UART */
 	RCC->APB1ENR |= RCC_UART5_EN;
@@ -190,10 +192,10 @@ void uart5_rx_tx_init(void){
 	set_uart_baudrate(UART5, APB1_CLK, UART5_BAUDRATE);
 
 	/* Enable DMA */
-	UART5->CR3 |= CR3_DMAT | CR3_DMAR;
+	UART5->CR3 = CR3_DMAT | CR3_DMAR;
 
 	/* Set transfer direction */
-	UART5->CR1 |= CR1_TE | CR1_RE;
+	UART5->CR1 = CR1_TE | CR1_RE;
 
 	/* Clear all flags */
 	UART5->SR &= ~SR_TC;
@@ -219,10 +221,12 @@ void dma1_init(void){
 	/*NVIC_EnableIRQ(DMA1_Stream3_IRQn);*/
 
 	/* Enable DMA Stream3 interrupt in NVIC */
+	NVIC_SetPriority(DMA1_Stream3_IRQn,15);
 	NVIC_EnableIRQ(DMA1_Stream3_IRQn);
 
-	/* Enable DMA Stream0 interrupt in NVIC */
-	NVIC_EnableIRQ(DMA1_Stream0_IRQn);
+	/* Enable DMA Stream7 interrupt in NVIC */
+	NVIC_SetPriority(DMA1_Stream7_IRQn,15);
+	NVIC_EnableIRQ(DMA1_Stream7_IRQn);
 }
 
 void dma1_stream0_rx_config(uint32_t rx_buffer){
@@ -293,7 +297,7 @@ void dma1_stream1_rx_config(uint32_t dst_buffer){
 	DMA1_Stream1->M0AR = (uint32_t)(dst_buffer);
 
 	/* Set number of transfers */
-	DMA1_Stream1->NDTR = (uint16_t) BUFFER_SIZE_USART3;
+	DMA1_Stream1->NDTR = (uint16_t) BUFFER_SIZE_USART2;
 
 	/* Select channel (4) */
 	DMA1_Stream1->CR &= ~DMA_SXCR_CHSEL_0;
@@ -304,7 +308,7 @@ void dma1_stream1_rx_config(uint32_t dst_buffer){
 	DMA1_Stream1->CR |= DMA_SXCR_MINC;
 
 	/* Enable transfer complete interrupt */
-	DMA1_Stream1->CR |= DMA_SXCR_TCIE;
+	DMA1_Stream1->CR |= DMA_SXCR_TCIE | DMA_SXCR_HTIE;
 
 	/* Enable circular mode */
 	DMA1_Stream1->CR |= DMA_SXCR_CRC;
@@ -317,6 +321,7 @@ void dma1_stream1_rx_config(uint32_t dst_buffer){
 	DMA1_Stream1->CR |= DMA_SXCR_EN;
 
 	/* Enable DMA Stream1 interrupt in NVIC */
+	NVIC_SetPriority(DMA1_Stream1_IRQn,15);
 	NVIC_EnableIRQ(DMA1_Stream1_IRQn);
 }
 
@@ -411,6 +416,44 @@ void dma1_stream5_rx_config(uint32_t rx_buffer){
 		NVIC_EnableIRQ(DMA1_Stream5_IRQn);
 }
 
+void dma1_stream7_tx_config(uint32_t source_buffer, uint32_t length){
+
+	/*Disable DMA1 stream 3*/
+	DMA1_Stream7->CR &= ~DMA_SXCR_EN;
+
+	/* Wait until DMA1 stream3 enable bit is 0 */
+	while((DMA1_Stream7->CR & DMA_SXCR_EN)) {}
+
+	/* Clear all interrupt flags related to DMA1 stream 3 */
+	DMA1->LIFCR = HIFCR_CTCIF7 | HIFCR_CHTIF7 | HIFCR_CTEIF7 | HIFCR_CDMEIF7 | HIFCR_CFEIF7;
+
+	/* Set peripheral address */
+	DMA1_Stream7->PAR = (uint32_t) (&(UART5->DR));
+
+	/* Set memory address */
+	DMA1_Stream7->M0AR = (uint32_t)(source_buffer);
+
+	/* Set number of transfers */
+	DMA1_Stream7->NDTR = length;
+
+	/* Select channel (4) */
+	DMA1_Stream7->CR &= ~DMA_SXCR_CHSEL_0;
+	DMA1_Stream7->CR &= ~DMA_SXCR_CHSEL_1;
+	DMA1_Stream7->CR |= DMA_SXCR_CHSEL_2;
+
+	/* Enable memory address increment */
+	DMA1_Stream7->CR |= DMA_SXCR_MINC;
+
+	/* Set transfer direction (memory to peripheral 01) */
+	DMA1_Stream7->CR &= ~DMA_SXCR_DIR_1;
+	DMA1_Stream7->CR |= DMA_SXCR_DIR_0;
+
+	DMA1_Stream7->CR |= DMA_SXCR_TCIE;
+
+	/* Enable DMA stream */
+	DMA1_Stream7->CR |= DMA_SXCR_EN;
+}
+
 void usart2_process_data ( gps *gpsPtr, uint8_t *ptr, size_t length ){
 
 	if ( !parseMessage(gpsPtr, (char *) ptr, length )){
@@ -434,17 +477,25 @@ void usart2_process_data ( gps *gpsPtr, uint8_t *ptr, size_t length ){
 
 }
 
-void uart5_process_data ( uint8_t *ptr, size_t length ){
+void usart3_process_data ( uint8_t *ptr, size_t length, char *response ){
+
+	/* Copy length bytes to ptr */
+	strncat(response,(char*)ptr, length);
+
+	/*while ( !(UART5->SR & SR_TXE) ) {}
+
+	c zero out arraywhile(	!(UART5->SR & SR_TC )) {}
+
 
 	for ( size_t i = 0; i < length; ++i ){
 
-		USART3->DR = ptr[i];
+		UART5->DR = ptr[i];
 
-		while ( !(USART3->SR & SR_TXE) ) {}
+		while ( !(UART5->SR & SR_TXE) ) {}
 
-		while(	!(USART3->SR & SR_TC )) {}
+		while(	!(UART5->SR & SR_TC )) {}
 
-	}
+	}*/
 }
 
 void usart2_dma_check_buffer ( uart_ds *ptr, gps *gpsPtr ){
@@ -470,47 +521,82 @@ void usart2_dma_check_buffer ( uart_ds *ptr, gps *gpsPtr ){
 	}
 }
 
-void uart5_dma_check_buffer( uart_ds *ptr ){
+int usart3_dma_check_buffer( uart_ds *ptr, char *response ){
 
-	size_t pos = BUFFER_SIZE_USART2 - (size_t) GET_DMA_DATA_LENGTH_UART5();
+	size_t pos = BUFFER_SIZE_USART2 - (size_t) GET_DMA_DATA_LENGTH_USART3();
+	DMA1_Stream1->NDTR = BUFFER_SIZE_USART2;
+
 
 	if ( pos >= 0 ){
 
 		if ( pos != ptr->old_pos ){
 
 		if ( pos > ptr->old_pos ){
-			uart5_process_data ( &(ptr->uart_rx_dma_buffer[ptr->old_pos]), pos - ptr->old_pos );
+			usart3_process_data(&(ptr->uart_rx_dma_buffer[ptr->old_pos]),pos - ptr->old_pos,response);
 		}
 		else{
-			uart5_process_data(&(ptr->uart_rx_dma_buffer[ptr->old_pos]),BUFFER_SIZE_USART2 - ptr->old_pos);
+			usart3_process_data(&(ptr->uart_rx_dma_buffer[ptr->old_pos]),BUFFER_SIZE_USART2 - ptr->old_pos,response);
 			if ( pos > 0 ){
-				uart5_process_data(&(ptr->uart_rx_dma_buffer[0]),pos);
+				usart3_process_data(&(ptr->uart_rx_dma_buffer[0]),pos, response);
+			}
+		}
+
+		ptr->old_pos = pos;
+	}
+
+	}
+
+	return (int) strlen(response);
+}
+
+int usart3_process_sim800l_answer( uint8_t *ptr, size_t length ){
+
+	for ( uint8_t i = 0; i < length; ++i ){
+
+		if ( ptr[i] == 'O' ){
+			if ( (i+1 < length)  ){
+				if ( ptr[i+1] == 'K'){
+					return 0;
+				}
+			}
+		}
+
+		if ( ptr[i] == 'E' ){
+			return 1;
+		}
+	}
+
+	return 1;
+
+}
+
+int usart3_dma_check_sim800l_answer( uart_ds *ptr ){
+
+	int ret_code = 1;
+
+	size_t pos = BUFFER_SIZE_USART2 - (size_t) GET_DMA_DATA_LENGTH_USART3();
+
+	if ( pos >= 0 ){
+
+		if ( pos != ptr->old_pos ){
+
+		if ( pos > ptr->old_pos ){
+			ret_code = usart3_process_sim800l_answer( &(ptr->uart_rx_dma_buffer[ptr->old_pos]), pos - ptr->old_pos );
+		}
+		else{
+			ret_code = usart3_process_sim800l_answer(&(ptr->uart_rx_dma_buffer[ptr->old_pos]),BUFFER_SIZE_USART2 - ptr->old_pos);
+			if ( pos > 0 ){
+				ret_code = usart3_process_sim800l_answer(&(ptr->uart_rx_dma_buffer[0]),pos);
 			}
 		}
 
 		ptr->old_pos = pos;
 	}
 	}
+
+	return ret_code;
 }
 
-void DMA1_Stream1_IRQHandler(void){
-
-	/* Transfer complete interrupt */
-	if ((DMA1->LISR) & LIFSR_CTCIF1){
-
-		DMA1->LIFCR |= LIFCR_CTCIF1;
-	}
-}
-
-void DMA1_Stream3_IRQHandler(void){
-
-	/* Transfer complete interrupt */
-	if ((DMA1->LISR) & LIFSR_CTCIF3){
-
-		GPIOB->ODR |= ODR_PB14;
-		DMA1->LIFCR |= LIFSR_CTCIF3;
-	}
-}
 
 void DMA1_Stream6_IRQHandler(void){
 
@@ -520,10 +606,6 @@ void uart2_callback(void){
 
 }
 
-
-void USART3_IRQHandler(void){
-
-}
 
 /**************************** READ & WRITE BUFFER ***********************************/
 
