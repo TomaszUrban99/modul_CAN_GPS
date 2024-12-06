@@ -326,12 +326,12 @@ void send_task ( void *parameters ){
 
 	/* Initialize array for message */
 
+	configure_module();
+
 	while (1) {
 
 		/*xEventGroupWaitBits(dataReceived,3, pdTRUE, pdTRUE, portMAX_DELAY);*/
 		/* message_length = prepare_json( &packetData,message); */
-
-		configure_module();
 
 		vTaskDelay(4000);
 		/*xEventGroupSetBits(dataReceived,PACKET_PREPARED);*/

@@ -74,6 +74,156 @@ int configure_module(){
 	xSemaphoreTake(TX_cplt, portMAX_DELAY);
 	receive_line_module(GSM_receiver,&usart3,response,2);
 
+	/* Enable full functionality of the modem */
+	do {
+		strcpy(messg,"AT+CFUN=1\r\n");
+		dma1_stream3_tx_config((uint32_t) messg, strlen(messg));
+		xSemaphoreTake(TX_cplt, portMAX_DELAY);
+		receive_line_module(GSM_receiver,&usart3,response,2);
+		GPIOB->ODR ^= ODR_PB14;
+	} while ( strstr(response,"OK") == NULL );
+
+	GPIOB->ODR &= ~ODR_PB14;
+
+
+	/* Check if SIM is ready to action */
+	do {
+		strcpy(messg,"AT+CPIN?\r\n");
+		dma1_stream3_tx_config((uint32_t) messg, strlen(messg));
+		xSemaphoreTake(TX_cplt, portMAX_DELAY);
+		receive_line_module(GSM_receiver,&usart3,response,3);
+		GPIOB->ODR ^= ODR_PB14;
+
+		while ( !(UART5->SR & SR_TXE) ) {}
+
+			while(	!(UART5->SR & SR_TC )) {}
+
+
+			for ( size_t i = 0; i < strlen(response); ++i ){
+
+				UART5->DR = response[i];
+
+				while ( !(UART5->SR & SR_TXE) ) {}
+
+				while(	!(UART5->SR & SR_TC )) {}
+
+		}
+	} while ( strstr(response,": READY") == NULL );
+
+	GPIOB->ODR &= ~ODR_PB14;
+
+	while ( !(UART5->SR & SR_TXE) ) {}
+
+		while(	!(UART5->SR & SR_TC )) {}
+
+
+		for ( size_t i = 0; i < strlen(response); ++i ){
+
+			UART5->DR = response[i];
+
+			while ( !(UART5->SR & SR_TXE) ) {}
+
+			while(	!(UART5->SR & SR_TC )) {}
+
+	}
+
+	/* Set APN name */
+	do {
+		strcpy(messg,"AT+CSTT=\"internet\",\"\",\"\"\r\n");
+		dma1_stream3_tx_config((uint32_t) messg, strlen(messg));
+		xSemaphoreTake(TX_cplt, portMAX_DELAY);
+		receive_line_module(GSM_receiver,&usart3,response,2);
+		GPIOB->ODR ^= ODR_PB14;
+
+		while ( !(UART5->SR & SR_TXE) ) {}
+
+			while(	!(UART5->SR & SR_TC )) {}
+
+
+			for ( size_t i = 0; i < strlen(response); ++i ){
+
+				UART5->DR = response[i];
+
+				while ( !(UART5->SR & SR_TXE) ) {}
+
+				while(	!(UART5->SR & SR_TC )) {}
+
+		}
+	} while ( strstr(response,"internet") == NULL );
+
+	GPIOB->ODR &= ~ODR_PB14;
+
+	while ( !(UART5->SR & SR_TXE) ) {}
+
+	while(	!(UART5->SR & SR_TC )) {}
+
+
+	for ( size_t i = 0; i < strlen(response); ++i ){
+
+		UART5->DR = response[i];
+
+		while ( !(UART5->SR & SR_TXE) ) {}
+
+		while(	!(UART5->SR & SR_TC )) {}
+
+}
+
+
+
+	/* Start wireless connection */
+	do {
+		strcpy(messg,"AT+CIICR\r\n");
+		dma1_stream3_tx_config((uint32_t) messg, strlen(messg));
+		xSemaphoreTake(TX_cplt, portMAX_DELAY);
+		receive_line_module(GSM_receiver,&usart3,response,2);
+		GPIOB->ODR ^= ODR_PB14;
+	} while ( strstr(response,"OK") == NULL);
+
+	GPIOB->ODR &= ~ODR_PB14;
+
+	while ( !(UART5->SR & SR_TXE) ) {}
+
+		while(	!(UART5->SR & SR_TC )) {}
+
+
+		for ( size_t i = 0; i < strlen(response); ++i ){
+
+			UART5->DR = response[i];
+
+			while ( !(UART5->SR & SR_TXE) ) {}
+
+			while(	!(UART5->SR & SR_TC )) {}
+
+	}
+
+
+		strcpy(messg,"AT+CIFSR\r\n");
+		dma1_stream3_tx_config((uint32_t) messg, strlen(messg));
+		xSemaphoreTake(TX_cplt, portMAX_DELAY);
+		receive_line_module(GSM_receiver,&usart3,response,2);
+		GPIOB->ODR ^= ODR_PB14;
+
+		while ( !(UART5->SR & SR_TXE) ) {}
+
+			while(	!(UART5->SR & SR_TC )) {}
+
+
+			for ( size_t i = 0; i < strlen(response); ++i ){
+
+				UART5->DR = response[i];
+
+				while ( !(UART5->SR & SR_TXE) ) {}
+
+				while(	!(UART5->SR & SR_TC )) {}
+
+		}
+
+	GPIOB->ODR &= ~ODR_PB14;
+
+	char *ptr;
+	ptr = strstr(response,"\r\n");
+	ptr += 2;
+
 	while ( !(UART5->SR & SR_TXE) ) {}
 
 		while(	!(UART5->SR & SR_TC )) {}
