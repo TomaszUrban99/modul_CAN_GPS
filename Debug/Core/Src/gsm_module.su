@@ -1,4 +1,9 @@
-../Core/Src/gsm_module.c:14:5:count_r_n	24	static
-../Core/Src/gsm_module.c:32:5:receive_line_module	32	static
-../Core/Src/gsm_module.c:58:5:activate_wireless_conn	16	static
-../Core/Src/gsm_module.c:65:5:configure_module	184	static
+../Core/Src/gsm_module.c:14:6:send_at_command	24	static
+../Core/Src/gsm_module.c:24:5:count_r_n	24	static
+../Core/Src/gsm_module.c:42:5:receive_at_command	32	static
+../Core/Src/gsm_module.c:69:5:start_tcpip_connection	120	static
+../Core/Src/gsm_module.c:111:5:activate_wireless_conn	16	static
+../Core/Src/gsm_module.c:118:5:configure_module	96	static
+../Core/Src/gsm_module.c:281:5:start_wireless_connection	4	static
+../Core/Src/gsm_module.c:285:5:send_tcpip_message	152	static
+../Core/Src/gsm_module.c:318:5:check_conn_status	88	static

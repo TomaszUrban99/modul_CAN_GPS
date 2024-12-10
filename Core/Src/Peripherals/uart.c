@@ -620,7 +620,8 @@ void uart2_callback(void){
 	 }
 }*/
 
-/* Read from RX uart buffer
+/* ReGPIOB->ODR |= ODR_PB0;
+ * ad from RX uart buffer
 int uart_read(ring_buffer *ptr){
 
 	 if ( ptr->_head == ptr->_tail ){

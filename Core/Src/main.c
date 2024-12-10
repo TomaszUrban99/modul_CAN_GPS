@@ -45,6 +45,11 @@ BaseType_t xHigherPriorityTaskWoken;
 
 can_frame msg_receive;
 
+/****************** TCP/IP ****************************/
+
+#define SERVER_ADDRESS						"20.215.33.146"
+#define PORT								"8080"
+
 /******************************************************/
 #define MESSAGE_LENGTH								128
 
@@ -115,17 +120,19 @@ int main(void)
 
 	can_init();
 
-	/*if ( pdPASS != xTaskCreate(usart2_dma_rx_task,"DMAU2",256,NULL,configMAX_PRIORITIES-1,NULL)){
+	if ( pdPASS != xTaskCreate(send_task,"SEND", 256, NULL, configMAX_PRIORITIES -1, NULL)){
+		GPIOB->ODR |= ODR_PB7;
+	}
+
+	if ( pdPASS != xTaskCreate(usart2_dma_rx_task,"DMAU2",256,NULL,configMAX_PRIORITIES-1,NULL)){
 		GPIOB->ODR |= ODR_PB7;
 		}
 
 	if ( pdPASS != xTaskCreate(obd_module,"CAN", 256, NULL, configMAX_PRIORITIES-1, NULL)){
 	 GPIOB->ODR |= ODR_PB7;
-	}*/
-
-	if ( pdPASS != xTaskCreate(send_task,"SEND", 256, NULL, configMAX_PRIORITIES -1, NULL)){
-		GPIOB->ODR |= ODR_PB7;
 	}
+
+
 
 	vTaskStartScheduler();
 
@@ -299,7 +306,6 @@ void usart2_dma_rx_task ( void *queuePtr ){
 
 	while(1){
 
-		GPIOB->ODR ^= ODR_PB0;
 
 		/* Wait until there is any element from USART2 IRQ and
 		 * DMA1_Stream5 IRQ handlers
@@ -325,18 +331,52 @@ void usart5_dma_rx_tx_task ( void *queuePtr ){
 void send_task ( void *parameters ){
 
 	/* Initialize array for message */
+	char message[128];
+	uint8_t message_length = 0;
 
+	/* Wait until module is on */
 	configure_module();
+	start_tcpip_connection(GSM_receiver,&usart3,SERVER_ADDRESS,PORT);
+	vTaskDelay(1000);
+
+	/* Is module connected? */
+	GPIOB->ODR &= ~ODR_PB14;
 
 	while (1) {
 
-		/*xEventGroupWaitBits(dataReceived,3, pdTRUE, pdTRUE, portMAX_DELAY);*/
-		/* message_length = prepare_json( &packetData,message); */
+		/* Check connection status */
+		while ( check_conn_status( GSM_receiver, &usart3) != CONNECT_OK ){
 
-		vTaskDelay(4000);
-		/*xEventGroupSetBits(dataReceived,PACKET_PREPARED);*/
+			GPIOB->ODR |= ODR_PB7;
+			/* Configure module */
+			configure_module();
+
+			/* Start TCP IP connection */
+
+			start_tcpip_connection(GSM_receiver,&usart3,SERVER_ADDRESS,PORT);
+		}
+
+		GPIOB->ODR &= ~ODR_PB7;
+
+		xEventGroupWaitBits(dataReceived,GPS_MODULE, pdTRUE, pdTRUE, portMAX_DELAY);
+		xEventGroupWaitBits(dataReceived,OBD_MODULE, pdTRUE, pdTRUE, portMAX_DELAY);
+
+		message_length = prepare_json( &packetData,(uint8_t *) message);
+
+		/* Check if there is tcpip connection */
+		if ( message_length > 0){
+
+			strcat(message,"\032"); /* Add end message */
+
+			/* Check if message has been sent successfully */
+			send_tcpip_message(message, GSM_receiver, &usart3);
+		}
+
+		xEventGroupSetBits(dataReceived,PACKET_PREPARED);
+
 	}
 }
+
 
 void obd_module ( void *parameters ){
 
@@ -347,7 +387,10 @@ void obd_module ( void *parameters ){
 	uint8_t request_code_array_length = sizeof(request_code)/sizeof(uint8_t);
 	uint8_t d = 0;
 
+	GPIOB->ODR &= ~ODR_PB7;
+
 	while(1){
+
 
 
 		for ( int i = 0; i < request_code_array_length; ++i){
@@ -367,6 +410,7 @@ void obd_module ( void *parameters ){
 		/* Send notification that all responses have been received ? Event group ?*/
 		xEventGroupSetBits(dataReceived,OBD_MODULE);
 		xEventGroupWaitBits(dataReceived,PACKET_PREPARED, pdTRUE, pdTRUE, portMAX_DELAY);
+
 
 	}
 }
