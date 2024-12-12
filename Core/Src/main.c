@@ -334,8 +334,9 @@ void send_task ( void *parameters ){
 	char message[128];
 	uint8_t message_length = 0;
 
-	/* Wait until module is on */
-	configure_module();
+	/* Configure until everything is correct */
+	while ( configure_module() ){}
+
 	start_tcpip_connection(GSM_receiver,&usart3,SERVER_ADDRESS,PORT);
 	vTaskDelay(1000);
 
@@ -347,16 +348,18 @@ void send_task ( void *parameters ){
 		/* Check connection status */
 		while ( check_conn_status( GSM_receiver, &usart3) != CONNECT_OK ){
 
-			GPIOB->ODR |= ODR_PB7;
+			GPIOB->ODR ^= ODR_PB7;
 			/* Configure module */
 			configure_module();
 
 			/* Start TCP IP connection */
 
 			start_tcpip_connection(GSM_receiver,&usart3,SERVER_ADDRESS,PORT);
+
+			vTaskDelay(500);
+
 		}
 
-		GPIOB->ODR &= ~ODR_PB7;
 
 		xEventGroupWaitBits(dataReceived,GPS_MODULE, pdTRUE, pdTRUE, portMAX_DELAY);
 		xEventGroupWaitBits(dataReceived,OBD_MODULE, pdTRUE, pdTRUE, portMAX_DELAY);

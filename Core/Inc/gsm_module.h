@@ -16,6 +16,7 @@
 #include "uart.h"
 
 #define NUMBER_OF_ATTEMPTS_TCPIP			5
+#define NUMBER_OF_ATTEMPTS					5
 
 enum connection_state { IP_INITIAL, IP_START,
 	IP_CONFIG, IP_GPRSACT,
