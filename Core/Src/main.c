@@ -1,264 +1,173 @@
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file           : main.c
+  * @brief          : Main program body
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2024 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
+/* USER CODE END Header */
+/* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
-#include "FreeRTOS.h"
-
-#include <event_groups.h>
-#include <queue.h>
-#include <string.h>
-#include <semphr.h>
-
+#include "string.h"
 #include "cmsis_os.h"
-#include "gpiob.h"
-#include "gps.h"
-#include "task.h"
-#include "uart.h"
-#include "can.h"
-#include "packet.h"
-#include "gsm_module.h"
 
-#define QUEUE_LENGTH								10
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
 
+/* USER CODE END Includes */
 
-/************** DATA STRUCTURES *********************/
-uart_ds usart2;
-uart_ds usart3;
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
 
-struct packet packetData;
+/* USER CODE END PTD */
 
-/**************** SYNCHRONISE ***********************/
-QueueHandle_t gpsReceiver;
-QueueHandle_t CAN_receiver;
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
 
-SemaphoreHandle_t GSM_receiver;
-SemaphoreHandle_t TX_cplt;
+/* USER CODE END PD */
 
-/* Event group */
-EventGroupHandle_t dataReceived;
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
 
-/* Event bits */
-#define OBD_MODULE									0x01
-#define GPS_MODULE									0x02
-#define PACKET_PREPARED								0x04
+/* USER CODE END PM */
 
-TaskHandle_t ptr = NULL;
-BaseType_t xHigherPriorityTaskWoken;
+/* Private variables ---------------------------------------------------------*/
 
-can_frame msg_receive;
+ETH_TxPacketConfig TxConfig;
+ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
+ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
 
-/****************** TCP/IP ****************************/
+ETH_HandleTypeDef heth;
 
-#define SERVER_ADDRESS						"20.215.33.146"
-#define PORT								"8080"
+UART_HandleTypeDef huart3;
 
-/******************************************************/
-#define MESSAGE_LENGTH								128
+PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
+/* Definitions for defaultTask */
+osThreadId_t defaultTaskHandle;
+const osThreadAttr_t defaultTask_attributes = {
+  .name = "defaultTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* USER CODE BEGIN PV */
+
+/* USER CODE END PV */
+
+/* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
+static void MX_ETH_Init(void);
+static void MX_USART3_UART_Init(void);
+static void MX_USB_OTG_FS_PCD_Init(void);
+void StartDefaultTask(void *argument);
 
-void USART2_IRQHandler(void);
-void USART3_IRQHandler(void);
+/* USER CODE BEGIN PFP */
 
-void DMA1_Stream1_IRQHandler(void);
-void DMA1_Stream5_IRQHandler(void);
+/* USER CODE END PFP */
 
-void CAN1_RX0_IRQHandler(void);
-void CAN1_RX1_IRQHandler(void);
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
 
+/* USER CODE END 0 */
 
-void usart2_dma_rx_task(void *parameters);
-void obd_module(void *parameters);
-void send_task(void *parameters );
-
-
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
 int main(void)
 {
 
-	/* HAL_Init contains NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4) */
-	HAL_Init();
-	SystemClock_Config();
+  /* USER CODE BEGIN 1 */
 
-	gpiob_init(); /* Init user's LED's */
+  /* USER CODE END 1 */
 
-	/* Create QUEUE's */
-	if ( (gpsReceiver = xQueueCreate(QUEUE_LENGTH,sizeof(uint8_t))) == NULL ){
-	  GPIOB->ODR |= ODR_PB14;
-	}
+  /* MCU Configuration--------------------------------------------------------*/
 
-	if ( (CAN_receiver = xQueueCreate(QUEUE_LENGTH,sizeof(uint8_t))) == NULL ){
-	  GPIOB->ODR |= ODR_PB14;
-	}
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
 
-	/* Create SEMAPHORES */
-	if ( (GSM_receiver = xSemaphoreCreateBinary()) == NULL ){
-		GPIOB->ODR |= ODR_PB14;
-	}
+  /* USER CODE BEGIN Init */
 
-	if ( (TX_cplt = xSemaphoreCreateBinary()) == NULL ){
-		GPIOB->ODR |= ODR_PB14;
-	}
+  /* USER CODE END Init */
 
-	/* Create event group */
-	if ( (dataReceived = xEventGroupCreate()) == NULL ){
-		GPIOB->ODR |= ODR_PB14;
-	}
+  /* Configure the system clock */
+  SystemClock_Config();
 
-	/* Event group description
-	 *
-	 * Bit 0 - received and processed data from OBD
-	 * Bi1 1 - received and processed data from GPS
-	 * Bit 2 - created packet to send
-	 *
-	 */
+  /* USER CODE BEGIN SysInit */
 
-	uart2_rx_tx_init();
-	uart3_rx_tx_init();
-	uart5_rx_tx_init();
+  /* USER CODE END SysInit */
 
-	dma1_init();
-	dma1_stream5_rx_config((uint32_t) usart2.uart_rx_dma_buffer);
-	dma1_stream1_rx_config((uint32_t) usart3.uart_rx_dma_buffer);
+  /* Initialize all configured peripherals */
+  MX_GPIO_Init();
+  MX_ETH_Init();
+  MX_USART3_UART_Init();
+  MX_USB_OTG_FS_PCD_Init();
+  /* USER CODE BEGIN 2 */
 
-	can_init();
+  /* USER CODE END 2 */
 
-	if ( pdPASS != xTaskCreate(send_task,"SEND", 256, NULL, configMAX_PRIORITIES -1, NULL)){
-		GPIOB->ODR |= ODR_PB7;
-	}
+  /* Init scheduler */
+  osKernelInitialize();
 
-	if ( pdPASS != xTaskCreate(usart2_dma_rx_task,"DMAU2",256,NULL,configMAX_PRIORITIES-1,NULL)){
-		GPIOB->ODR |= ODR_PB7;
-		}
+  /* USER CODE BEGIN RTOS_MUTEX */
+  /* add mutexes, ... */
+  /* USER CODE END RTOS_MUTEX */
 
-	if ( pdPASS != xTaskCreate(obd_module,"CAN", 256, NULL, configMAX_PRIORITIES-1, NULL)){
-	 GPIOB->ODR |= ODR_PB7;
-	}
+  /* USER CODE BEGIN RTOS_SEMAPHORES */
+  /* add semaphores, ... */
+  /* USER CODE END RTOS_SEMAPHORES */
 
+  /* USER CODE BEGIN RTOS_TIMERS */
+  /* start timers, add new ones, ... */
+  /* USER CODE END RTOS_TIMERS */
 
+  /* USER CODE BEGIN RTOS_QUEUES */
+  /* add queues, ... */
+  /* USER CODE END RTOS_QUEUES */
 
-	vTaskStartScheduler();
+  /* Create the thread(s) */
+  /* creation of defaultTask */
+  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
+  /* USER CODE BEGIN RTOS_THREADS */
+  /* add threads, ... */
+  /* USER CODE END RTOS_THREADS */
+
+  /* USER CODE BEGIN RTOS_EVENTS */
+  /* add events, ... */
+  /* USER CODE END RTOS_EVENTS */
+
+  /* Start scheduler */
+  osKernelStart();
+
+  /* We should never get here as control is now taken by the scheduler */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
   while (1)
   {
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
   }
+  /* USER CODE END 3 */
 }
 
-void CAN1_RX0_IRQHandler(void){
-
-	if ( CAN1->RF0R & CAN_RF0R_FMP0 ){
-
-		/* FIFO No */
-		uint8_t d = 0;
-
-		xHigherPriorityTaskWoken = pdFALSE;
-
-		if ( xQueueSendFromISR(CAN_receiver,&d,&xHigherPriorityTaskWoken) != pdPASS ){
-			GPIOB->ODR |= ODR_PB7;
-		}
-
-		/* Receive message - read CAN frame */
-		can_receive(&msg_receive, d);
-
-		portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
-
-	}
-
-}
-
-void CAN1_RX1_IRQHandler(void){
-
-	if ( CAN1->RF1R & CAN_RF1R_FMP1){
-
-			uint8_t d = 1;
-			xHigherPriorityTaskWoken = pdFALSE;
-
-			if ( xQueueSendFromISR(CAN_receiver,&d,&xHigherPriorityTaskWoken) == errQUEUE_FULL ){
-				GPIOB->ODR |= ODR_PB7;
-			}
-
-			portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
-	}
-}
-
-void USART2_IRQHandler(void){
-
-	if (USART2->SR & SR_IDLE){
-
-		uint8_t d = 1;
-
-		xHigherPriorityTaskWoken = pdFALSE;
-		USART2->DR;
-
-		/* Check if message has been sent correctly */
-		if( xQueueSendFromISR(gpsReceiver,&d,&xHigherPriorityTaskWoken) != pdPASS ){
-			GPIOB->ODR |= ODR_PB7;
-		}
-
-		portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
-	}
-}
-
-void USART3_IRQHandler (void){
-
-	if ( USART3->SR & SR_IDLE ){
-
-		xHigherPriorityTaskWoken = pdFALSE;
-		USART3->DR;
-
-
-		if ( xSemaphoreGiveFromISR(GSM_receiver,&xHigherPriorityTaskWoken) != pdPASS ){
-			GPIOB->ODR |= ODR_PB7;
-		}
-
-		portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
-	}
-
-}
-
-void DMA1_Stream1_IRQHandler(void){
-
-	xHigherPriorityTaskWoken = pdFALSE;
-
-	if (((DMA1->LISR) & LIFSR_CTCIF1)){
-
-		/*xSemaphoreGiveFromISR(GSM_receiver,&xHigherPriorityTaskWoken);*/
-		DMA1->LIFCR |= LIFCR_CTCIF1;
-	}
-
-	if (((DMA1->LISR) & LIFSR_CHTIF1)){
-
-		GPIOB->ODR |= ODR_PB14;
-		/*xSemaphoreGiveFromISR(GSM_receiver,&xHigherPriorityTaskWoken);*/
-		DMA1->LIFCR |= LIFCR_CHTIF1;
-	}
-}
-
-void DMA1_Stream3_IRQHandler(void){
-
-	xHigherPriorityTaskWoken = pdFALSE;
-
-	if ( ((DMA1->LISR) & LIFSR_CTCIF3)){
-		xSemaphoreGiveFromISR(TX_cplt,&xHigherPriorityTaskWoken);
-		DMA1->LIFCR |= LIFCR_CTCIF3;
-	}
-}
-
-void DMA1_Stream5_IRQHandler(void){
-
-	uint8_t d =1;
-	xHigherPriorityTaskWoken = pdFALSE;
-
-	if (((DMA1->HISR) & HIFSR_CTCIF5)){
-
-		xQueueSendFromISR(gpsReceiver,&d,&xHigherPriorityTaskWoken);
-		DMA1->HIFCR |= HIFCR_CTCIF5;
-	}
-
-	if (((DMA1->HISR) & HIFSR_CHTIF5)){
-
-		xQueueSendFromISR(gpsReceiver,&d,&xHigherPriorityTaskWoken);
-		DMA1->HIFCR |= HIFCR_CHTIF5;
-	}
-}
-
+/**
+  * @brief System Clock Configuration
+  * @retval None
+  */
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
@@ -300,142 +209,220 @@ void SystemClock_Config(void)
   }
 }
 
-void usart2_dma_rx_task ( void *queuePtr ){
+/**
+  * @brief ETH Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_ETH_Init(void)
+{
 
-	uint8_t d = 1;
+  /* USER CODE BEGIN ETH_Init 0 */
 
-	while(1){
+  /* USER CODE END ETH_Init 0 */
 
+   static uint8_t MACAddr[6];
 
-		/* Wait until there is any element from USART2 IRQ and
-		 * DMA1_Stream5 IRQ handlers
-		 */
-		xQueueReceive(gpsReceiver, &d, portMAX_DELAY);
+  /* USER CODE BEGIN ETH_Init 1 */
 
-		/* Process message */
-		usart2_dma_check_buffer(&usart2, &packetData._gps_data);
+  /* USER CODE END ETH_Init 1 */
+  heth.Instance = ETH;
+  MACAddr[0] = 0x00;
+  MACAddr[1] = 0x80;
+  MACAddr[2] = 0xE1;
+  MACAddr[3] = 0x00;
+  MACAddr[4] = 0x00;
+  MACAddr[5] = 0x00;
+  heth.Init.MACAddr = &MACAddr[0];
+  heth.Init.MediaInterface = HAL_ETH_RMII_MODE;
+  heth.Init.TxDesc = DMATxDscrTab;
+  heth.Init.RxDesc = DMARxDscrTab;
+  heth.Init.RxBuffLen = 1524;
 
-		/* Set bits */
-		xEventGroupSetBits(dataReceived,GPS_MODULE);
-	}
+  /* USER CODE BEGIN MACADDRESS */
+
+  /* USER CODE END MACADDRESS */
+
+  if (HAL_ETH_Init(&heth) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  memset(&TxConfig, 0 , sizeof(ETH_TxPacketConfig));
+  TxConfig.Attributes = ETH_TX_PACKETS_FEATURES_CSUM | ETH_TX_PACKETS_FEATURES_CRCPAD;
+  TxConfig.ChecksumCtrl = ETH_CHECKSUM_IPHDR_PAYLOAD_INSERT_PHDR_CALC;
+  TxConfig.CRCPadCtrl = ETH_CRC_PAD_INSERT;
+  /* USER CODE BEGIN ETH_Init 2 */
+
+  /* USER CODE END ETH_Init 2 */
 
 }
 
-void usart5_dma_rx_tx_task ( void *queuePtr ){
+/**
+  * @brief USART3 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART3_UART_Init(void)
+{
 
-	while(1){
+  /* USER CODE BEGIN USART3_Init 0 */
 
-	}
+  /* USER CODE END USART3_Init 0 */
+
+  /* USER CODE BEGIN USART3_Init 1 */
+
+  /* USER CODE END USART3_Init 1 */
+  huart3.Instance = USART3;
+  huart3.Init.BaudRate = 115200;
+  huart3.Init.WordLength = UART_WORDLENGTH_8B;
+  huart3.Init.StopBits = UART_STOPBITS_1;
+  huart3.Init.Parity = UART_PARITY_NONE;
+  huart3.Init.Mode = UART_MODE_TX_RX;
+  huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART3_Init 2 */
+
+  /* USER CODE END USART3_Init 2 */
+
 }
 
-void send_task ( void *parameters ){
+/**
+  * @brief USB_OTG_FS Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USB_OTG_FS_PCD_Init(void)
+{
 
-	/* Initialize array for message */
-	char message[128];
-	uint8_t message_length = 0;
+  /* USER CODE BEGIN USB_OTG_FS_Init 0 */
 
-	/* Configure until everything is correct */
-	while ( configure_module() ){}
+  /* USER CODE END USB_OTG_FS_Init 0 */
 
-	start_tcpip_connection(GSM_receiver,&usart3,SERVER_ADDRESS,PORT);
-	vTaskDelay(1000);
+  /* USER CODE BEGIN USB_OTG_FS_Init 1 */
 
-	/* Is module connected? */
-	GPIOB->ODR &= ~ODR_PB14;
+  /* USER CODE END USB_OTG_FS_Init 1 */
+  hpcd_USB_OTG_FS.Instance = USB_OTG_FS;
+  hpcd_USB_OTG_FS.Init.dev_endpoints = 4;
+  hpcd_USB_OTG_FS.Init.speed = PCD_SPEED_FULL;
+  hpcd_USB_OTG_FS.Init.dma_enable = DISABLE;
+  hpcd_USB_OTG_FS.Init.phy_itface = PCD_PHY_EMBEDDED;
+  hpcd_USB_OTG_FS.Init.Sof_enable = ENABLE;
+  hpcd_USB_OTG_FS.Init.low_power_enable = DISABLE;
+  hpcd_USB_OTG_FS.Init.lpm_enable = DISABLE;
+  hpcd_USB_OTG_FS.Init.vbus_sensing_enable = ENABLE;
+  hpcd_USB_OTG_FS.Init.use_dedicated_ep1 = DISABLE;
+  if (HAL_PCD_Init(&hpcd_USB_OTG_FS) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USB_OTG_FS_Init 2 */
 
-	while (1) {
+  /* USER CODE END USB_OTG_FS_Init 2 */
 
-		/* Check connection status */
-		while ( check_conn_status( GSM_receiver, &usart3) != CONNECT_OK ){
-
-			GPIOB->ODR ^= ODR_PB7;
-			/* Configure module */
-			configure_module();
-
-			/* Start TCP IP connection */
-
-			start_tcpip_connection(GSM_receiver,&usart3,SERVER_ADDRESS,PORT);
-
-			vTaskDelay(500);
-
-		}
-
-
-		xEventGroupWaitBits(dataReceived,GPS_MODULE, pdTRUE, pdTRUE, portMAX_DELAY);
-		xEventGroupWaitBits(dataReceived,OBD_MODULE, pdTRUE, pdTRUE, portMAX_DELAY);
-
-		message_length = prepare_json( &packetData,(uint8_t *) message);
-
-		/* Check if there is tcpip connection */
-		if ( message_length > 0){
-
-			strcat(message,"\032"); /* Add end message */
-
-			/* Check if message has been sent successfully */
-			send_tcpip_message(message, GSM_receiver, &usart3);
-		}
-
-		xEventGroupSetBits(dataReceived,PACKET_PREPARED);
-
-	}
 }
 
+/**
+  * @brief GPIO Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_GPIO_Init(void)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+/* USER CODE BEGIN MX_GPIO_Init_1 */
+/* USER CODE END MX_GPIO_Init_1 */
 
-void obd_module ( void *parameters ){
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOH_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOG_CLK_ENABLE();
 
-	uint8_t request_code[] = { CAN_ENGINE_RPM, CAN_ENGINE_LOAD, CAN_TANK_LEVEL};
-	can_frame msg_transmit;
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, LD1_Pin|LD3_Pin|LD2_Pin, GPIO_PIN_RESET);
 
-	/* Request code array length */
-	uint8_t request_code_array_length = sizeof(request_code)/sizeof(uint8_t);
-	uint8_t d = 0;
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(USB_PowerSwitchOn_GPIO_Port, USB_PowerSwitchOn_Pin, GPIO_PIN_RESET);
 
-	GPIOB->ODR &= ~ODR_PB7;
+  /*Configure GPIO pin : USER_Btn_Pin */
+  GPIO_InitStruct.Pin = USER_Btn_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(USER_Btn_GPIO_Port, &GPIO_InitStruct);
 
-	while(1){
+  /*Configure GPIO pins : LD1_Pin LD3_Pin LD2_Pin */
+  GPIO_InitStruct.Pin = LD1_Pin|LD3_Pin|LD2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : USB_PowerSwitchOn_Pin */
+  GPIO_InitStruct.Pin = USB_PowerSwitchOn_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(USB_PowerSwitchOn_GPIO_Port, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : USB_OverCurrent_Pin */
+  GPIO_InitStruct.Pin = USB_OverCurrent_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(USB_OverCurrent_GPIO_Port, &GPIO_InitStruct);
 
-		for ( int i = 0; i < request_code_array_length; ++i){
-			can_send_request(&msg_transmit,request_code[i]);
-		}
-
-		for ( int i = 0; i < request_code_array_length; ++i){
-
-			/* Wait until new message incomes */
-			xQueueReceive(CAN_receiver,&d, portMAX_DELAY);
-
-			/* Receive and process message */
-
-			can_process(&msg_receive, &packetData._obd_data);
-		}
-
-		/* Send notification that all responses have been received ? Event group ?*/
-		xEventGroupSetBits(dataReceived,OBD_MODULE);
-		xEventGroupWaitBits(dataReceived,PACKET_PREPARED, pdTRUE, pdTRUE, portMAX_DELAY);
-
-
-	}
+/* USER CODE BEGIN MX_GPIO_Init_2 */
+/* USER CODE END MX_GPIO_Init_2 */
 }
 
-void can_task ( void *parameters ){
+/* USER CODE BEGIN 4 */
 
-	can_frame msg;
-	msg._can_id = CAN_CLIENT_ID;
-	msg._dlc = 8;
+/* USER CODE END 4 */
 
-	for ( uint8_t i = 0; i < 8; ++i ){
-		msg._data[i] = i;
-	}
-
-	while(1){
-
-		GPIOB->ODR ^= ODR_PB14;
-		can_send(&msg);
-		vTaskDelay(2000);
-	}
+/* USER CODE BEGIN Header_StartDefaultTask */
+/**
+  * @brief  Function implementing the defaultTask thread.
+  * @param  argument: Not used
+  * @retval None
+  */
+/* USER CODE END Header_StartDefaultTask */
+void StartDefaultTask(void *argument)
+{
+  /* USER CODE BEGIN 5 */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END 5 */
 }
 
+/**
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM1 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM1) {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.

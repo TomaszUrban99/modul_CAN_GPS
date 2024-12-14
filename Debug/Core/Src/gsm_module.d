@@ -21,8 +21,6 @@ Core/Src/gsm_module.o: ../Core/Src/gsm_module.c ../Core/Inc/gsm_module.h \
  ../Drivers/CMSIS/Include/cmsis_gcc.h \
  ../Drivers/CMSIS/Include/mpu_armv7.h \
  ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h \
- ../Core/Inc/gps.h \
- /home/tomasz/STM32CubeIDE/workspace_1.16.1/PracaInz_v6/Core/Inc/Peripherals/gpiob.h \
  /home/tomasz/STM32CubeIDE/workspace_1.16.1/PracaInz_v6/Core/Inc/Peripherals/USART_registers.h
 ../Core/Inc/gsm_module.h:
 ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
@@ -47,6 +45,4 @@ Core/Src/gsm_module.o: ../Core/Src/gsm_module.c ../Core/Inc/gsm_module.h \
 ../Drivers/CMSIS/Include/cmsis_gcc.h:
 ../Drivers/CMSIS/Include/mpu_armv7.h:
 ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h:
-../Core/Inc/gps.h:
-/home/tomasz/STM32CubeIDE/workspace_1.16.1/PracaInz_v6/Core/Inc/Peripherals/gpiob.h:
 /home/tomasz/STM32CubeIDE/workspace_1.16.1/PracaInz_v6/Core/Inc/Peripherals/USART_registers.h:

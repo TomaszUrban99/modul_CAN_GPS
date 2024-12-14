@@ -21,7 +21,6 @@ Core/Src/Tasks/tasks.o: ../Core/Src/Tasks/tasks.c \
  ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h \
  /home/tomasz/STM32CubeIDE/workspace_1.16.1/PracaInz_v6/Core/Inc/Peripherals/uart.h \
  /home/tomasz/STM32CubeIDE/workspace_1.16.1/PracaInz_v6/Core/Inc/Peripherals/gpiob.h \
- ../Core/Inc/gps.h \
  /home/tomasz/STM32CubeIDE/workspace_1.16.1/PracaInz_v6/Core/Inc/Peripherals/USART_registers.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  ../Core/Inc/stm32f4xx_hal_conf.h \
@@ -72,7 +71,6 @@ Core/Src/Tasks/tasks.o: ../Core/Src/Tasks/tasks.c \
 ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h:
 /home/tomasz/STM32CubeIDE/workspace_1.16.1/PracaInz_v6/Core/Inc/Peripherals/uart.h:
 /home/tomasz/STM32CubeIDE/workspace_1.16.1/PracaInz_v6/Core/Inc/Peripherals/gpiob.h:
-../Core/Inc/gps.h:
 /home/tomasz/STM32CubeIDE/workspace_1.16.1/PracaInz_v6/Core/Inc/Peripherals/USART_registers.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:

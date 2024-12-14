@@ -10,7 +10,6 @@
 
 #include "config.h"
 #include "gpiob.h"
-#include "gps.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -88,7 +87,7 @@ void dma1_stream0_rx_config(uint32_t rx_buffer);
 void dma1_stream7_tx_config(uint32_t source_buffer, uint32_t length );
 
 /* DMA check & process data */
-void usart2_dma_check_buffer ( uart_ds *ptr, gps *gpsPtr );
+void usart2_dma_check_buffer ( uart_ds *ptr, char *message );
 
 void usart3_process_data ( uint8_t *ptr, size_t length, char *response );
 
@@ -98,10 +97,12 @@ int usart3_dma_check_sim800l_answer( uart_ds *ptr );
 
 int usart3_process_sim800l_answer( uint8_t *ptr, size_t length );
 
-void usart2_process_data ( gps *gpsPtr, uint8_t *ptr, size_t length );
-/*void uart_read(USART_TypeDef *USART, int *ch);*/
-
-
+/*!
+ * 	\brief
+ *
+ * 	\par
+ */
+void usart2_process_data ( uint8_t *ptr, size_t length, char *message );
 
 
 /*************************** RETARGETING PRINTF *************************************************/

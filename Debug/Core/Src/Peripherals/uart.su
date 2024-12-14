@@ -12,10 +12,6 @@
 ../Core/Src/Peripherals/uart.c:369:6:dma1_stream5_rx_config	16	static
 ../Core/Src/Peripherals/uart.c:419:6:dma1_stream7_tx_config	16	static
 ../Core/Src/Peripherals/uart.c:457:6:usart2_process_data	24	static
-../Core/Src/Peripherals/uart.c:480:6:usart3_process_data	24	static
-../Core/Src/Peripherals/uart.c:501:6:usart2_dma_check_buffer	24	static
-../Core/Src/Peripherals/uart.c:524:5:usart3_dma_check_buffer	24	static
-../Core/Src/Peripherals/uart.c:552:5:usart3_process_sim800l_answer	24	static
-../Core/Src/Peripherals/uart.c:573:5:usart3_dma_check_sim800l_answer	24	static
-../Core/Src/Peripherals/uart.c:601:6:DMA1_Stream6_IRQHandler	4	static
-../Core/Src/Peripherals/uart.c:605:6:uart2_callback	4	static
+../Core/Src/Peripherals/uart.c:467:6:usart3_process_data	24	static
+../Core/Src/Peripherals/uart.c:474:6:usart2_dma_check_buffer	24	static
+../Core/Src/Peripherals/uart.c:498:5:usart3_dma_check_buffer	24	static

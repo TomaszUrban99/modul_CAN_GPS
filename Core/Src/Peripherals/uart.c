@@ -454,26 +454,13 @@ void dma1_stream7_tx_config(uint32_t source_buffer, uint32_t length){
 	DMA1_Stream7->CR |= DMA_SXCR_EN;
 }
 
-void usart2_process_data ( gps *gpsPtr, uint8_t *ptr, size_t length ){
+void usart2_process_data ( uint8_t *ptr, size_t length, char *message ){
 
-	if ( !parseMessage(gpsPtr, (char *) ptr, length )){
+	strncat(message,(char*) ptr, length);
 
-		/*
-		 *
-		 sprintf(gpsPtr->gps_buffer,"Location: %f %c, %f %c\n", gpsPtr->_latitude,
-				gpsPtr->_latitude_attitude, gpsPtr->_longitude, gpsPtr->_longitude_attitude);
+	/*if ( !parseMessage(gpsPtr, (char *) ptr, length )){
 
-
-		for ( size_t i = 0; i < strlen(gpsPtr->gps_buffer); ++i){
-			USART3->DR = gpsPtr->gps_buffer[i];
-			GPIOB->ODR ^= ODR_PB7;
-			while(!(USART3->SR & SR_TXE)){}
-		}
-
-		while(!(USART3->SR & SR_TC)) {}
-		*/
-
-	}
+	}*/
 
 }
 
@@ -482,23 +469,9 @@ void usart3_process_data ( uint8_t *ptr, size_t length, char *response ){
 	/* Copy length bytes to ptr */
 	strncat(response,(char*)ptr, length);
 
-	/*while ( !(UART5->SR & SR_TXE) ) {}
-
-	c zero out arraywhile(	!(UART5->SR & SR_TC )) {}
-
-
-	for ( size_t i = 0; i < length; ++i ){
-
-		UART5->DR = ptr[i];
-
-		while ( !(UART5->SR & SR_TXE) ) {}
-
-		while(	!(UART5->SR & SR_TC )) {}
-
-	}*/
 }
 
-void usart2_dma_check_buffer ( uart_ds *ptr, gps *gpsPtr ){
+void usart2_dma_check_buffer ( uart_ds *ptr, char *message ){
 
 	size_t pos = BUFFER_SIZE_USART2 - (size_t) GET_DMA_DATA_LENGTH_USART2();
 
@@ -507,12 +480,13 @@ void usart2_dma_check_buffer ( uart_ds *ptr, gps *gpsPtr ){
 		if ( pos != ptr->old_pos ){
 
 		if ( pos > ptr->old_pos ){
-			usart2_process_data(gpsPtr, &(ptr->uart_rx_dma_buffer[ptr->old_pos]),pos - ptr->old_pos);
+			usart2_process_data(&(ptr->uart_rx_dma_buffer[ptr->old_pos]),pos - ptr->old_pos, message);
 		}
 		else{
-			usart2_process_data(gpsPtr, &(ptr->uart_rx_dma_buffer[ptr->old_pos]),BUFFER_SIZE_USART2 - ptr->old_pos);
+			usart2_process_data(&(ptr->uart_rx_dma_buffer[ptr->old_pos]),
+					BUFFER_SIZE_USART2 - ptr->old_pos, message);
 			if ( pos > 0 ){
-				usart2_process_data(gpsPtr,&(ptr->uart_rx_dma_buffer[0]),pos);
+				usart2_process_data(&(ptr->uart_rx_dma_buffer[0]),pos, message);
 			}
 		}
 
@@ -524,8 +498,6 @@ void usart2_dma_check_buffer ( uart_ds *ptr, gps *gpsPtr ){
 int usart3_dma_check_buffer( uart_ds *ptr, char *response ){
 
 	size_t pos = BUFFER_SIZE_USART2 - (size_t) GET_DMA_DATA_LENGTH_USART3();
-	DMA1_Stream1->NDTR = BUFFER_SIZE_USART2;
-
 
 	if ( pos >= 0 ){
 
@@ -549,102 +521,5 @@ int usart3_dma_check_buffer( uart_ds *ptr, char *response ){
 	return (int) strlen(response);
 }
 
-int usart3_process_sim800l_answer( uint8_t *ptr, size_t length ){
 
-	for ( uint8_t i = 0; i < length; ++i ){
-
-		if ( ptr[i] == 'O' ){
-			if ( (i+1 < length)  ){
-				if ( ptr[i+1] == 'K'){
-					return 0;
-				}
-			}
-		}
-
-		if ( ptr[i] == 'E' ){
-			return 1;
-		}
-	}
-
-	return 1;
-
-}
-
-int usart3_dma_check_sim800l_answer( uart_ds *ptr ){
-
-	int ret_code = 1;
-
-	size_t pos = BUFFER_SIZE_USART2 - (size_t) GET_DMA_DATA_LENGTH_USART3();
-
-	if ( pos >= 0 ){
-
-		if ( pos != ptr->old_pos ){
-
-		if ( pos > ptr->old_pos ){
-			ret_code = usart3_process_sim800l_answer( &(ptr->uart_rx_dma_buffer[ptr->old_pos]), pos - ptr->old_pos );
-		}
-		else{
-			ret_code = usart3_process_sim800l_answer(&(ptr->uart_rx_dma_buffer[ptr->old_pos]),BUFFER_SIZE_USART2 - ptr->old_pos);
-			if ( pos > 0 ){
-				ret_code = usart3_process_sim800l_answer(&(ptr->uart_rx_dma_buffer[0]),pos);
-			}
-		}
-
-		ptr->old_pos = pos;
-	}
-	}
-
-	return ret_code;
-}
-
-
-void DMA1_Stream6_IRQHandler(void){
-
-}
-
-void uart2_callback(void){
-
-}
-
-
-/**************************** READ & WRITE BUFFER ***********************************/
-
-/* Store character in buffer */
-/*void store_char(ring_buffer *ptr, char ch){
-
-	 int i = (unsigned int) (ptr->_head + 1) & BUFFER_SIZE;
-
-	 if ( i != ptr->_tail ){
-		 ptr->_buffer[ptr->_head] = ch;
-		 ptr->_head = i;
-	 }
-}*/
-
-/* ReGPIOB->ODR |= ODR_PB0;
- * ad from RX uart buffer
-int uart_read(ring_buffer *ptr){
-
-	 if ( ptr->_head == ptr->_tail ){
-		 return -1;
-	 }
-	 else {
-		 uint8_t c = ptr->_buffer[ptr->_tail];
-		 ptr->_tail = (uint16_t)(ptr->_tail + 1) % BUFFER_SIZE;
-		 return c;
-	 }
-}
-
-void uart_write(ring_buffer *ptr, int ch){
-
-	if (ch>=0)
-		{
-			int i = (ptr->_head + 1) % BUFFER_SIZE;
-
-			while (i == ptr->_tail);
-
-			ptr->_buffer[ptr->_head] = (uint8_t)ch;
-			ptr->_head = i;
-
-		}
-}*/
 

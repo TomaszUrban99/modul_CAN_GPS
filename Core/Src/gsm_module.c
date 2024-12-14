@@ -9,7 +9,6 @@
 
 extern SemaphoreHandle_t GSM_receiver;
 extern SemaphoreHandle_t TX_cplt;
-extern uart_ds usart3;
 
 void send_at_command ( const char *message ) {
 
@@ -64,6 +63,19 @@ int receive_at_command (SemaphoreHandle_t sim_module,
 	return 0;
 }
 
+void wait_until_registration(SemaphoreHandle_t sim_module, uart_ds *uart3){
+
+	char response[32];
+
+		/* Send and check network registration status */
+		send_at_command("AT+CREG?\r\n");
+		receive_at_command(sim_module,uart3,response,3);
+
+		vTaskDelay(1000);
+
+	return;
+
+}
 
 int start_tcpip_connection(SemaphoreHandle_t sim_module,
 		uart_ds *uart3, char *ip_dst_address, char *dst_port){
@@ -119,67 +131,146 @@ int activate_wireless_conn(char *msg){
 	return 0;
 }
 
-int configure_module(){
+int configure_module( SemaphoreHandle_t sim_module,
+		uart_ds *uart3 ){
 
 	char response[64];
 
 	/* Handshake - check hardware */
 	send_at_command("AT\r\n");
-	receive_at_command(GSM_receiver,&usart3,response,2);
+	receive_at_command(sim_module,uart3,response,2);
 
-	if (strstr(response,"OK") == NULL ){
-		return 1;
-	}
 
-	/* Very important-> enter status IP INITIAL */
-	send_at_command("AT+CIPSHUT\r\n");
-	receive_at_command(GSM_receiver,&usart3,response,2);
 
-	if ( strstr(response,"SHUT OK") == NULL ){
-		return 1;
-	}
-
-	/* Enable full functionality of the modem */
-	send_at_command("AT+CFUN=1\r\n");
-	receive_at_command(GSM_receiver,&usart3,response,2);
+	send_at_command("AT+CSQ\r\n");
+	receive_at_command(sim_module,uart3,response,2);
 
 	if ( strstr(response,"OK") == NULL ){
 		return 1;
 	}
 
-	/* Check if SIM is ready to action */
-	send_at_command("AT+CPIN?\r\n");
-	receive_at_command(GSM_receiver,&usart3,response,3);
+	while ( !(UART5->SR & SR_TXE) ) {}
 
-	if ( strstr(response,": READY") == NULL ){
-		return 1;
-	}
+	while(	!(UART5->SR & SR_TC )) {}
 
-	send_at_command("AT+CREG?\r\n");
-	receive_at_command(GSM_receiver,&usart3,response,2);
+
+	for ( size_t i = 0; i < strlen(response); ++i ){
+
+		UART5->DR = response[i];
 
 		while ( !(UART5->SR & SR_TXE) ) {}
 
 		while(	!(UART5->SR & SR_TC )) {}
 
+	}
 
-		for ( size_t i = 0; i < strlen(response); ++i ){
 
-			UART5->DR = response[i];
+	/* Very important-> enter status IP INITIAL */
+	send_at_command("AT+CIPSHUT\r\n");
+	receive_at_command(sim_module,uart3,response,2);
 
-			while ( !(UART5->SR & SR_TXE) ) {}
+	if ( strstr(response,"SHUT OK") == NULL ){
+		return 1;
+	}
 
-			while(	!(UART5->SR & SR_TC )) {}
+	while ( !(UART5->SR & SR_TXE) ) {}
 
-		}
+	while(	!(UART5->SR & SR_TC )) {}
+
+
+	for ( size_t i = 0; i < strlen(response); ++i ){
+
+		UART5->DR = response[i];
+
+		while ( !(UART5->SR & SR_TXE) ) {}
+
+		while(	!(UART5->SR & SR_TC )) {}
+
+	}
+
+	/* Enable full functionality of the modem */
+	send_at_command("AT+CFUN=1\r\n");
+	receive_at_command(sim_module,uart3,response,2);
+
+	if ( strstr(response,"OK") == NULL ){
+		return 1;
+	}
+
+	while ( !(UART5->SR & SR_TXE) ) {}
+
+	while(	!(UART5->SR & SR_TC )) {}
+
+
+	for ( size_t i = 0; i < strlen(response); ++i ){
+
+		UART5->DR = response[i];
+
+		while ( !(UART5->SR & SR_TXE) ) {}
+
+		while(	!(UART5->SR & SR_TC )) {}
+
+	}
+
+	/* Check if SIM is ready to action */
+	send_at_command("AT+CPIN?\r\n");
+	receive_at_command(sim_module,uart3,response,3);
+
+	if ( strstr(response,": READY") == NULL ){
+		return 1;
+	}
+
+
+	while ( !(UART5->SR & SR_TXE) ) {}
+
+	while(	!(UART5->SR & SR_TC )) {}
+
+
+	for ( size_t i = 0; i < strlen(response); ++i ){
+
+		UART5->DR = response[i];
+
+		while ( !(UART5->SR & SR_TXE) ) {}
+
+		while(	!(UART5->SR & SR_TC )) {}
+
+	}
+
+
+	send_at_command("AT+CREG?\r\n");
+	receive_at_command(sim_module,uart3,response,2);
+
+	if ( strstr(response,"OK") == NULL ){
+		return 1;
+	}
+
+	while ( !(UART5->SR & SR_TXE) ) {}
+
+	while(	!(UART5->SR & SR_TC )) {}
+
+
+	for ( size_t i = 0; i < strlen(response); ++i ){
+
+		UART5->DR = response[i];
+
+		while ( !(UART5->SR & SR_TXE) ) {}
+
+		while(	!(UART5->SR & SR_TC )) {}
+
+	}
+
+
 
 	if ( strstr(response,"0,1") == NULL ){
 		return 1;
 	}
 
+	if ( strstr(response,"OK") == NULL ){
+		return 1;
+	}
+
 
 	send_at_command("AT+CGATT?\r\n");
-	receive_at_command(GSM_receiver,&usart3,response,3);
+	receive_at_command(sim_module,uart3,response,3);
 
 	if ( strstr(response,": 1") == NULL ){
 		return 1;
@@ -190,7 +281,7 @@ int configure_module(){
 
 	/* Set APN name */
 	send_at_command("AT+CSTT=\"internet\",\"\",\"\"\r\n");
-	receive_at_command(GSM_receiver,&usart3,response,2);
+	receive_at_command(sim_module,uart3,response,2);
 
 		while ( !(UART5->SR & SR_TXE) ) {}
 
@@ -214,7 +305,7 @@ int configure_module(){
 
 	/* Start wireless connection */
 	send_at_command("AT+CIICR\r\n");
-	receive_at_command(GSM_receiver,&usart3,response,2);
+	receive_at_command(sim_module,uart3,response,2);
 
 	while ( !(UART5->SR & SR_TXE) ) {}
 
@@ -237,7 +328,7 @@ int configure_module(){
 
 
 	send_at_command("AT+CIFSR\r\n");
-	receive_at_command(GSM_receiver,&usart3,response,2);
+	receive_at_command(sim_module,uart3,response,2);
 
 	while ( !(UART5->SR & SR_TXE) ) {}
 

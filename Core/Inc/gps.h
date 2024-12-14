@@ -11,7 +11,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <FreeRTOS.h>
+#include <queue.h>
 
+#include "uart.h"
 #include "gpiob.h"
 #include "stm32f429xx.h"
 
@@ -20,6 +23,9 @@
 #define GPGGA_HEADER					"$GPGGA"
 
 typedef struct gps {
+
+	/* Indicates whether message is accurate or not */
+	uint8_t isValid;
 
 	char gps_buffer [GPS_BUFFER];
 
@@ -31,12 +37,14 @@ typedef struct gps {
 
 } gps;
 
+int receiveMessage ( uart_ds *uart2, char *message );
+
 /*!
  *  parseMessage - parse $GPGGA messages
  *
  *  Parse NMEA GPGGA message and extract location coordinates.
  */
-int parseMessage ( gps *gpsStruct, char *msg, size_t length);
+int parseMessage ( gps *gpsStruct, char *msg );
 
 
 

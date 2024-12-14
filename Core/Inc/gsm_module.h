@@ -32,7 +32,10 @@ int count_r_n ( char *response, int r_n_number );
 int receive_at_command ( SemaphoreHandle_t sim_module,
 		uart_ds *uart3, char *response, int r_n_number );
 
-int configure_module();
+void wait_until_registration( SemaphoreHandle_t sim_module, uart_ds *uart3);
+
+int configure_module( SemaphoreHandle_t sim_module,
+		uart_ds *uart3 );
 
 int start_tcpip_connection(SemaphoreHandle_t sim_module,
 		uart_ds *uart3, char *ip_dst_address, char *dst_port);
